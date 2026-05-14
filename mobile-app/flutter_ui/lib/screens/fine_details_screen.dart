@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/fine_model.dart';
 import '../widgets/fine_detail_item.dart';
 import '../widgets/custom_button.dart';
+import 'payment_screen.dart';
 
 class FineDetailsScreen extends StatelessWidget {
   final Fine fine;
@@ -217,10 +218,10 @@ class FineDetailsScreen extends StatelessWidget {
                   CustomButton(
                     text: 'Proceed to Payment',
                     onPressed: () {
-                      // TODO: Navigate to PaymentScreen
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Navigating to payment...'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentScreen(fine: fine),
                         ),
                       );
                     },
