@@ -4,6 +4,40 @@ import '../widgets/custom_button.dart';
 import '../models/fine_model.dart';
 import 'fine_details_screen.dart';
 
+// Sample fine data for testing
+final unpaidFine = Fine(
+  referenceNumber: 'TF20240512345',
+  categoryId: 'CAT001',
+  driverName: 'Nimal Perera',
+  violationType: 'Speed Limit Violation',
+  amount: 5000.00,
+  dueDate: '2026-05-31',
+  status: 'Unpaid',
+  issuedDate: '2026-04-15',
+);
+
+final paidFine = Fine(
+  referenceNumber: 'TF20240423156',
+  categoryId: 'CAT002',
+  driverName: 'Samantha Silva',
+  violationType: 'No Parking Zone',
+  amount: 3500.00,
+  dueDate: '2026-05-20',
+  status: 'Paid',
+  issuedDate: '2026-03-20',
+);
+
+final overdueFine = Fine(
+  referenceNumber: 'TF20240201789',
+  categoryId: 'CAT003',
+  driverName: 'Rajith Kumar',
+  violationType: 'Traffic Light Violation',
+  amount: 7500.00,
+  dueDate: '2026-04-15',
+  status: 'Overdue',
+  issuedDate: '2026-02-15',
+);
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -24,6 +58,28 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Fine _getFineByReference(String reference) {
+    // Return different fine based on reference number
+    if (reference == 'TF20240512345') {
+      return unpaidFine;
+    } else if (reference == 'TF20240423156') {
+      return paidFine;
+    } else if (reference == 'TF20240201789') {
+      return overdueFine;
+    }
+    // Default: return unpaid fine with entered reference
+    return Fine(
+      referenceNumber: _referenceNumberController.text,
+      categoryId: _categoryIdController.text,
+      driverName: 'Test User',
+      violationType: 'Test Violation',
+      amount: 5000.00,
+      dueDate: '2026-05-31',
+      status: 'Unpaid',
+      issuedDate: '2026-04-15',
+    );
+  }
+
   void _checkFine() {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -38,16 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
             _isLoading = false;
           });
 
-          // Create sample fine data
-          final fine = Fine(
-            referenceNumber: _referenceNumberController.text,
-            categoryId: _categoryIdController.text,
-            driverName: 'Nimal Perera',
-            violationType: 'Speed Limit Violation',
-            amount: 5000.00,
-            dueDate: '2026-05-31',
-            status: 'Unpaid',
-            issuedDate: '2026-04-15',
+          // Get fine based on reference number
+          final fine = _getFineByReference(
+            _referenceNumberController.text,
           );
 
           // Navigate to FineDetailsScreen
