@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/fine_model.dart';
 import '../models/payment_model.dart';
+import '../models/test_payment_cards.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/payment_text_field.dart';
 import 'payment_success_screen.dart';
@@ -525,13 +526,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                       ),
                       padding: const EdgeInsets.all(12),
-                      child: Text(
-                        'Test: Use card ending in 1111 for success, any other for failure',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[800],
-                          fontWeight: FontWeight.w500,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Test Cards:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[800],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '✓ 1111111111111111 | Success\n✗ 2222222222222222 | Declined\n✗ 3333333333333333 | Expired',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey[700],
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
