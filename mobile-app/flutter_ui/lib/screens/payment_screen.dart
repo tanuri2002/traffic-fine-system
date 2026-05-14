@@ -6,6 +6,7 @@ import '../models/test_payment_cards.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/payment_text_field.dart';
 import 'payment_success_screen.dart';
+import 'payment_failure_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
   final Fine fine;
@@ -151,30 +152,44 @@ class _PaymentScreenState extends State<PaymentScreen> {
             cardholderName: _cardholderNameController.text,
           );
 
-          // TODO: Call payment API
-          // For now, simulate successful payment
-          final paymentResponse = PaymentResponse(
-            success: true,
-            message: 'Payment processed successfully',
-            transactionId: 'TXN${DateTime.now().millisecondsSinceEpoch}',
-            timestamp: DateTime.now().toString(),
-          );
+          // Check test card and process accordingly
+          final cleanedCardNumber =
+              _cardNumberController.text.replaceAll(' ', '');
+          final testCard = TestPaymentCards.getTestCard(cleanedCardNumber);
+          final transactionId = 'TXN${DateTime.now().millisecondsSinceEpoch}';
 
-          if (paymentResponse.success) {
+          if (testCard != null && testCard.status == 'Success') {
+            // Success case
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => PaymentSuccessScreen(
                   fine: widget.fine,
-                  transactionId: paymentResponse.transactionId ?? '',
+                  transactionId: transactionId,
+                ),
+              ),
+            );
+          } else if (testCard != null) {
+            // Failure case
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PaymentFailureScreen(
+                  fine: widget.fine,
+                  failureReason: testCard.status,
+                  transactionId: transactionId,
                 ),
               ),
             );
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(paymentResponse.message),
-                backgroundColor: Colors.red,
+            // Unknown card - simulate success
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PaymentSuccessScreen(
+                  fine: widget.fine,
+                  transactionId: transactionId,
+                ),
               ),
             );
           }
