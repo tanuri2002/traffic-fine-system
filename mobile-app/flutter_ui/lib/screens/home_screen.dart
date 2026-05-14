@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
+import '../models/fine_model.dart';
+import 'fine_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -35,9 +37,25 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _isLoading = false;
           });
-          // TODO: Navigate to FineDetailsScreen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Fine details fetched successfully')),
+
+          // Create sample fine data
+          final fine = Fine(
+            referenceNumber: _referenceNumberController.text,
+            categoryId: _categoryIdController.text,
+            driverName: 'Nimal Perera',
+            violationType: 'Speed Limit Violation',
+            amount: 5000.00,
+            dueDate: '2026-05-31',
+            status: 'Unpaid',
+            issuedDate: '2026-04-15',
+          );
+
+          // Navigate to FineDetailsScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FineDetailsScreen(fine: fine),
+            ),
           );
         }
       });
@@ -87,8 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     width: 100,
                     height: 100,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF001F5C),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF001F5C),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -97,10 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 70,
                         height: 70,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(
+                          return const Icon(
                             Icons.security,
                             size: 50,
-                            color: const Color(0xFF001F5C),
+                            color: Color(0xFF001F5C),
                           );
                         },
                       ),
