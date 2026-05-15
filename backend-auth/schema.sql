@@ -1,0 +1,48 @@
+CREATE DATABASE IF NOT EXISTS traffic_fine_auth;
+USE traffic_fine_auth;
+
+CREATE TABLE IF NOT EXISTS officers (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  badge_number VARCHAR(50) NOT NULL,
+  name VARCHAR(150) NOT NULL,
+  phone VARCHAR(30) NOT NULL,
+  district VARCHAR(100) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('officer', 'admin') NOT NULL DEFAULT 'officer',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_officers_badge_number (badge_number)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS categories (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  code VARCHAR(30) NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  amount_lkr DECIMAL(10,2) NOT NULL,
+  description TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_categories_code (code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS fines (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  reference_number VARCHAR(60) NOT NULL,
+  category_id BIGINT UNSIGNED NOT NULL,
+  officer_id BIGINT UNSIGNED NOT NULL,
+  driver_license_no VARCHAR(60) NOT NULL,
+  vehicle_no VARCHAR(30) NOT NULL,
+  status ENUM('UNPAID', 'PAID') NOT NULL DEFAULT 'UNPAID',
+  paid_at DATETIME NULL,
+  payment_channel ENUM('MOBILE', 'WEB') NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_fines_reference_number (reference_number),
+  KEY idx_fines_officer_id (officer_id),
+  KEY idx_fines_category_id (category_id),
+  CONSTRAINT fk_fines_category_id FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_fines_officer_id FOREIGN KEY (officer_id) REFERENCES officers (id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
