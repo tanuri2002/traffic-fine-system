@@ -81,11 +81,11 @@ class FineDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Align(
+                    const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Fine Details',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

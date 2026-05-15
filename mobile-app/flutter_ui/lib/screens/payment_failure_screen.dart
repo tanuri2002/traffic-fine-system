@@ -252,18 +252,18 @@ class PaymentFailureScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        _ActionItem(
+                        const _ActionItem(
                           number: '1',
                           text:
                               'Review your card details and ensure they are correct',
                         ),
                         const SizedBox(height: 8),
-                        _ActionItem(
+                        const _ActionItem(
                           number: '2',
                           text: 'Try again with the correct information',
                         ),
                         const SizedBox(height: 8),
-                        _ActionItem(
+                        const _ActionItem(
                           number: '3',
                           text: 'Contact your bank if the issue persists',
                         ),
