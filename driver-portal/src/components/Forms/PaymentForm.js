@@ -1,29 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './PaymentForm.css';
+import AppContext from '../../context/AppContext';
+import { validateCardNumber, validateExpiryDate, validateCVV } from '../../utils/validation';
 
-function PaymentForm() {
-  const [formData, setFormData] = useState({
-    cardName: '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: ''
-  });
+function PaymentForm({ onSubmit }) {
+  const { setPaymentData, setLoading, setError } = useContext(AppContext);
+  const [formData, setFormData] = useState({ cardName: '', cardNumber: '', expiryDate: '', cvv: '' });
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: null }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle payment submission
+    const cardErr = validateCardNumber(formData.cardNumber);
+    const expErr = validateExpiryDate(formData.expiryDate);
+    const cvvErr = validateCVV(formData.cvv);
+    const newErrors = {};
+    if (cardErr) newErrors.cardNumber = cardErr;
+    if (expErr) newErrors.expiryDate = expErr;
+    if (cvvErr) newErrors.cvv = cvvErr;
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const paymentPayload = { ...formData };
+      setPaymentData(paymentPayload);
+      if (onSubmit) {
+        await onSubmit(paymentPayload);
+      }
+    } catch (err) {
+      setError(err.message || 'Payment failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form className="payment-form" onSubmit={handleSubmit}>
+    <form className="payment-form" onSubmit={handleSubmit} noValidate>
       <div className="form-group">
         <label htmlFor="cardName">Cardholder Name</label>
         <input
@@ -46,9 +65,10 @@ function PaymentForm() {
           value={formData.cardNumber}
           onChange={handleChange}
           placeholder="Enter card number"
-          maxLength="16"
-          required
+          maxLength="19"
+          aria-invalid={!!errors.cardNumber}
         />
+        {errors.cardNumber && <div className="input-error" role="alert">{errors.cardNumber}</div>}
       </div>
 
       <div className="form-row">
@@ -62,7 +82,9 @@ function PaymentForm() {
             onChange={handleChange}
             placeholder="MM/YY"
             required
+            aria-invalid={!!errors.expiryDate}
           />
+          {errors.expiryDate && <div className="input-error" role="alert">{errors.expiryDate}</div>}
         </div>
 
         <div className="form-group">
@@ -74,9 +96,11 @@ function PaymentForm() {
             value={formData.cvv}
             onChange={handleChange}
             placeholder="CVV"
-            maxLength="3"
+            maxLength="4"
             required
+            aria-invalid={!!errors.cvv}
           />
+          {errors.cvv && <div className="input-error" role="alert">{errors.cvv}</div>}
         </div>
       </div>
 
