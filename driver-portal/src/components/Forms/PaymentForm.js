@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import './PaymentForm.css';
 import AppContext from '../../context/AppContext';
+import { toast } from 'react-toastify';
 import { validateCardNumber, validateExpiryDate, validateCVV } from '../../utils/validation';
 
 function PaymentForm({ onSubmit }) {
@@ -31,11 +32,15 @@ function PaymentForm({ onSubmit }) {
     try {
       const paymentPayload = { ...formData };
       setPaymentData(paymentPayload);
+      toast.success('Payment data validated');
       if (onSubmit) {
         await onSubmit(paymentPayload);
+        toast.success('Payment processed');
       }
     } catch (err) {
-      setError(err.message || 'Payment failed');
+      const msg = err.message || 'Payment failed';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

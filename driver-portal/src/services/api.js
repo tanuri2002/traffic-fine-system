@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { getFineByReference, processMockPayment } from './mockData';
+
+const USE_MOCK = process.env.REACT_APP_USE_MOCK === 'true';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 const AUTH_API_URL = process.env.REACT_APP_AUTH_API_URL || 'http://localhost:5000/auth';
@@ -35,23 +38,37 @@ apiClient.interceptors.request.use(
   error => Promise.reject(error)
 );
 
-// API endpoints
+// API endpoints (use mock when enabled)
 export const fineService = {
-  getFineDetails: (referenceNumber, categoryId) =>
-    apiClient.get(`/fines/${referenceNumber}`, {
-      params: { categoryId }
-    }),
-  
-  searchFine: (referenceNumber) =>
-    apiClient.get(`/fines/search/${referenceNumber}`)
+  getFineDetails: (referenceNumber, categoryId) => {
+    if (USE_MOCK) {
+      return getFineByReference(referenceNumber, categoryId);
+    }
+    return apiClient.get(`/fines/${referenceNumber}`, { params: { categoryId } });
+  },
+
+  searchFine: (referenceNumber) => {
+    if (USE_MOCK) {
+      return getFineByReference(referenceNumber);
+    }
+    return apiClient.get(`/fines/search/${referenceNumber}`);
+  }
 };
 
 export const paymentService = {
-  processPayment: (paymentData) =>
-    paymentClient.post('/process', paymentData),
-  
-  getPaymentStatus: (transactionId) =>
-    paymentClient.get(`/status/${transactionId}`)
+  processPayment: (paymentData) => {
+    if (USE_MOCK) {
+      return processMockPayment(paymentData);
+    }
+    return paymentClient.post('/process', paymentData);
+  },
+
+  getPaymentStatus: (transactionId) => {
+    if (USE_MOCK) {
+      return Promise.resolve({ data: { status: 'CONFIRMED' } });
+    }
+    return paymentClient.get(`/status/${transactionId}`);
+  }
 };
 
 export const authService = {

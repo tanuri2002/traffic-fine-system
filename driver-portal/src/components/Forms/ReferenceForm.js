@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ReferenceForm.css';
 import AppContext from '../../context/AppContext';
+import { toast } from 'react-toastify';
 import { validateReferenceNumber, validateCategoryId } from '../../utils/validation';
 import { fineService } from '../../services/api';
 
@@ -34,17 +35,22 @@ function ReferenceForm() {
       const resp = await fineService.getFineDetails(formData.referenceNumber, formData.categoryId);
       if (resp?.data) {
         setFineData(resp.data);
+        toast.success('Fine details loaded');
         navigate('/details', { state: { fineDetails: resp.data } });
       } else if (resp?.error) {
         setError(resp.error);
+        toast.error(resp.error);
       } else {
         // fallback: set minimal data so user can continue
         const fallback = { referenceNumber: formData.referenceNumber, status: 'unpaid', amount: 0 };
         setFineData(fallback);
+        toast.info('Using fallback fine data');
         navigate('/details', { state: { fineDetails: fallback } });
       }
     } catch (err) {
-      setError(err.message || 'Failed to fetch fine details');
+      const msg = err.message || 'Failed to fetch fine details';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
