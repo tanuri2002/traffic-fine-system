@@ -116,7 +116,7 @@ class FineDetailsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -130,7 +130,8 @@ class FineDetailsScreen extends StatelessWidget {
                           label: 'Driver Name',
                           value: fine.driverName,
                           iconColor: Colors.blue,
-                          iconBackgroundColor: Colors.blue.withOpacity(0.1),
+                          iconBackgroundColor:
+                              Colors.blue.withValues(alpha: 0.1),
                         ),
                         const Divider(height: 24),
                         FineDetailItem(
@@ -138,7 +139,8 @@ class FineDetailsScreen extends StatelessWidget {
                           label: 'Violation Type',
                           value: fine.violationType,
                           iconColor: Colors.orange,
-                          iconBackgroundColor: Colors.orange.withOpacity(0.1),
+                          iconBackgroundColor:
+                              Colors.orange.withValues(alpha: 0.1),
                         ),
                         const Divider(height: 24),
                         FineDetailItem(
@@ -146,7 +148,8 @@ class FineDetailsScreen extends StatelessWidget {
                           label: 'Fine Amount',
                           value: 'Rs. ${fine.amount.toStringAsFixed(2)}',
                           iconColor: Colors.green,
-                          iconBackgroundColor: Colors.green.withOpacity(0.1),
+                          iconBackgroundColor:
+                              Colors.green.withValues(alpha: 0.1),
                         ),
                         const Divider(height: 24),
                         FineDetailItem(
@@ -154,7 +157,8 @@ class FineDetailsScreen extends StatelessWidget {
                           label: 'Due Date',
                           value: fine.dueDate,
                           iconColor: Colors.purple,
-                          iconBackgroundColor: Colors.purple.withOpacity(0.1),
+                          iconBackgroundColor:
+                              Colors.purple.withValues(alpha: 0.1),
                         ),
                         const Divider(height: 24),
                         FineDetailItem(
@@ -163,7 +167,7 @@ class FineDetailsScreen extends StatelessWidget {
                           value: fine.referenceNumber,
                           iconColor: const Color(0xFF001F5C),
                           iconBackgroundColor:
-                              const Color(0xFF001F5C).withOpacity(0.1),
+                              const Color(0xFF001F5C).withValues(alpha: 0.1),
                         ),
                         const Divider(height: 24),
                         FineDetailItem(
@@ -171,7 +175,8 @@ class FineDetailsScreen extends StatelessWidget {
                           label: 'Category ID',
                           value: fine.categoryId,
                           iconColor: Colors.indigo,
-                          iconBackgroundColor: Colors.indigo.withOpacity(0.1),
+                          iconBackgroundColor:
+                              Colors.indigo.withValues(alpha: 0.1),
                         ),
                       ],
                     ),
@@ -182,10 +187,10 @@ class FineDetailsScreen extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.15),
+                      color: Colors.amber.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.amber.withOpacity(0.3),
+                        color: Colors.amber.withValues(alpha: 0.3),
                       ),
                     ),
                     padding: const EdgeInsets.all(16),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../models/fine_model.dart';
-import '../models/payment_model.dart';
 import '../models/test_payment_cards.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/payment_text_field.dart';
@@ -140,17 +138,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
           setState(() {
             _isProcessing = false;
           });
-
-          // Create payment request
-          final paymentRequest = PaymentRequest(
-            fineReferenceNumber: widget.fine.referenceNumber,
-            categoryId: widget.fine.categoryId,
-            amount: widget.fine.amount,
-            cardNumber: _cardNumberController.text,
-            expiryDate: _expiryDateController.text,
-            cvv: _cvvController.text,
-            cardholderName: _cardholderNameController.text,
-          );
 
           // Check test card and process accordingly
           final cleanedCardNumber =
