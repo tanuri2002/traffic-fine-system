@@ -1,7 +1,14 @@
+/// File: lib/screens/payment_success_screen.dart
+/// Purpose: Display payment success confirmation and receipt details.
+/// Author: Member 3
+/// Date: May 2026
 import 'package:flutter/material.dart';
 import '../models/fine_model.dart';
 import '../widgets/custom_button.dart';
 
+/// PaymentSuccessScreen
+///
+/// Shows a confirmation UI and receipt for a successful payment.
 class PaymentSuccessScreen extends StatelessWidget {
   final Fine fine;
   final String transactionId;
@@ -49,7 +56,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                     'Your traffic fine has been paid',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -69,7 +76,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -118,10 +125,10 @@ class PaymentSuccessScreen extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.08),
+                      color: Colors.green.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.green.withOpacity(0.3),
+                        color: Colors.green.withValues(alpha: 0.3),
                       ),
                     ),
                     padding: const EdgeInsets.all(16),

@@ -1,9 +1,17 @@
+/// File: lib/screens/fine_details_screen.dart
+/// Purpose: Display detailed information for a specific traffic fine.
+/// Author: Member 3
+/// Date: May 2026
 import 'package:flutter/material.dart';
 import '../models/fine_model.dart';
 import '../widgets/fine_detail_item.dart';
 import '../widgets/custom_button.dart';
 import 'payment_screen.dart';
 
+/// FineDetailsScreen
+///
+/// Stateless screen that shows full fine information (driver, amount,
+/// violation, dates) and provides actions to proceed to payment.
 class FineDetailsScreen extends StatelessWidget {
   final Fine fine;
 
@@ -13,6 +21,9 @@ class FineDetailsScreen extends StatelessWidget {
   }) : super(key: key);
 
   Color _getStatusColor(String status) {
+    /// Maps a fine status string to a Material color used for the
+    /// status badge. Supported statuses: 'Paid', 'Overdue', default
+    /// to 'Unpaid' (orange).
     switch (status.toLowerCase()) {
       case 'paid':
         return Colors.green;

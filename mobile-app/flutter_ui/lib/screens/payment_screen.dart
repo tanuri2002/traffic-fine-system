@@ -1,3 +1,7 @@
+/// File: lib/screens/payment_screen.dart
+/// Purpose: Payment form UI for processing card payments against a fine.
+/// Author: Member 3
+/// Date: May 2026
 import 'package:flutter/material.dart';
 import '../models/fine_model.dart';
 import '../models/test_payment_cards.dart';
@@ -6,6 +10,11 @@ import '../widgets/payment_text_field.dart';
 import 'payment_success_screen.dart';
 import 'payment_failure_screen.dart';
 
+/// PaymentScreen
+///
+/// Presents a secure payment form (card number, expiry, CVV, name),
+/// performs client-side validation and routes to success/failure
+/// screens using `TestPaymentCards` during development.
 class PaymentScreen extends StatefulWidget {
   final Fine fine;
 
@@ -37,6 +46,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   String? _validateCardNumber(String? value) {
+    /// Validates card number formatting (non-empty, 16 digits).
     if (value == null || value.isEmpty) {
       return 'Please enter card number';
     }
@@ -48,6 +58,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   String? _validateExpiryDate(String? value) {
+    /// Validates expiry date in MM/YY format.
     if (value == null || value.isEmpty) {
       return 'Please enter expiry date';
     }
@@ -58,6 +69,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   String? _validateCVV(String? value) {
+    /// Validates CVV (3 digits expected).
     if (value == null || value.isEmpty) {
       return 'Please enter CVV';
     }
@@ -75,6 +87,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _formatCardNumber(String value) {
+    /// Formats a raw card number into groups of 4 digits for display.
     String cleaned = value.replaceAll(' ', '');
     if (cleaned.length > 16) {
       cleaned = cleaned.substring(0, 16);
@@ -97,6 +110,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _formatExpiryDate(String value) {
+    /// Auto-formats expiry date input into `MM/YY` as the user types.
     String cleaned = value.replaceAll('/', '');
     if (cleaned.length > 4) {
       cleaned = cleaned.substring(0, 4);
@@ -118,6 +132,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _processPayment() {
+    /// Performs client-side checks, simulates processing and routes to
+    /// the appropriate outcome screen. Uses `TestPaymentCards` to
+    /// determine success/failure in development mode.
     if (_formKey.currentState!.validate()) {
       if (!_agreedToTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -277,7 +294,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           ],
                         ),
-                        backgroundColor: Colors.green.withOpacity(0.1),
+                        backgroundColor: Colors.green.withValues(alpha: 0.1),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -296,7 +313,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.2),
+                              color: Colors.blue.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: const Center(
@@ -486,10 +503,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.08),
+                        color: Colors.blue.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.blue.withOpacity(0.2),
+                          color: Colors.blue.withValues(alpha: 0.2),
                         ),
                       ),
                       padding: const EdgeInsets.all(12),
@@ -521,10 +538,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.1),
+                        color: Colors.amber.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.amber.withOpacity(0.3),
+                          color: Colors.amber.withValues(alpha: 0.3),
                         ),
                       ),
                       padding: const EdgeInsets.all(12),

@@ -1,3 +1,8 @@
+/// File: lib/screens/home_screen.dart
+/// Purpose: Home screen for the Traffic Fine Payment app. Provides a
+/// fine reference lookup form and navigation to fine details.
+/// Author: Member 3
+/// Date: May 2026
 import 'package:flutter/material.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
@@ -38,6 +43,11 @@ final overdueFine = Fine(
   issuedDate: '2026-02-15',
 );
 
+/// HomeScreen
+///
+/// Stateful screen that allows users to lookup a traffic fine by
+/// reference number and category. Validates inputs and navigates to
+/// `FineDetailsScreen` with a `Fine` model instance.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -59,7 +69,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Fine _getFineByReference(String reference) {
-    // Return different fine based on reference number
+    /// Returns a sample `Fine` based on the provided reference number.
+    ///
+    /// This is a local test helper that maps well-known test references
+    /// to `unpaidFine`, `paidFine`, and `overdueFine`. If no match is
+    /// found, it returns a default `Fine` using the current form values.
+
     if (reference == 'TF20240512345') {
       return unpaidFine;
     } else if (reference == 'TF20240423156') {
@@ -81,6 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _checkFine() {
+    /// Triggered when the user submits the lookup form.
+    /// Validates inputs, shows a loading state, and navigates to
+    /// `FineDetailsScreen`. In production this would call the backend.
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -112,6 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String? _validateReferenceNumber(String? value) {
+    /// Validator for the fine reference number field.
+    /// Ensures non-empty and minimum length.
     if (value == null || value.isEmpty) {
       return 'Please enter fine reference number';
     }
@@ -122,6 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String? _validateCategoryId(String? value) {
+    /// Validator for the category ID field.
+    /// Ensures the field is not empty.
     if (value == null || value.isEmpty) {
       return 'Please enter category ID';
     }

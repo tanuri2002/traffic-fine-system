@@ -1,7 +1,16 @@
+/// File: lib/screens/payment_failure_screen.dart
+/// Purpose: Payment failure screen presenting error details and recovery
+/// steps for declined/expired/limit-exceeded/processing errors.
+/// Author: Member 3
+/// Date: May 2026
 import 'package:flutter/material.dart';
 import '../models/fine_model.dart';
 import '../widgets/custom_button.dart';
 
+/// PaymentFailureScreen
+///
+/// Presents a user-friendly failure page describing why a payment
+/// attempt failed and provides next steps and navigation options.
 class PaymentFailureScreen extends StatelessWidget {
   final Fine fine;
   final String failureReason;
@@ -15,6 +24,8 @@ class PaymentFailureScreen extends StatelessWidget {
   }) : super(key: key);
 
   Color _getStatusColor(String reason) {
+    /// Map failure reason (case-insensitive) to a color used in the
+    /// header and emphasis UI.
     switch (reason.toLowerCase()) {
       case 'declined':
         return Colors.red;
@@ -30,6 +41,7 @@ class PaymentFailureScreen extends StatelessWidget {
   }
 
   String _getFailureMessage(String reason) {
+    /// Returns a user-friendly failure message for the given reason.
     switch (reason.toLowerCase()) {
       case 'declined':
         return 'Your card was declined. Please check your card details and try again.';
@@ -45,6 +57,7 @@ class PaymentFailureScreen extends StatelessWidget {
   }
 
   IconData _getFailureIcon(String reason) {
+    /// Selects an icon representing the failure reason.
     switch (reason.toLowerCase()) {
       case 'declined':
         return Icons.cancel;
