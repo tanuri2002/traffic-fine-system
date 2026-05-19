@@ -33,7 +33,7 @@ function LoginPage() {
     if (response.success) {
       navigate("/dashboard");
     } else {
-      alert("Invalid credentials");
+      alert(response.message || "Invalid credentials");
     }
   };
 
