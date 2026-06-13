@@ -5,13 +5,13 @@ import './ConfirmationPage.css';
 function ConfirmationPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const transactionId = location.state?.transactionId;
+  const receiptNumber = location.state?.receiptNumber || location.state?.transactionId;
 
   useEffect(() => {
-    if (!transactionId) {
+    if (!receiptNumber) {
       navigate('/');
     }
-  }, [transactionId, navigate]);
+  }, [receiptNumber, navigate]);
 
   return (
     <div className="confirmation-page">
@@ -22,8 +22,8 @@ function ConfirmationPage() {
 
         <div className="confirmation-details">
           <div className="detail-item">
-            <label>Transaction ID:</label>
-            <span>{transactionId}</span>
+            <label>Receipt Number:</label>
+            <span>{receiptNumber}</span>
           </div>
           <div className="detail-item">
             <label>Date & Time:</label>

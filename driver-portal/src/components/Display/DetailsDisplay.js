@@ -23,16 +23,16 @@ function DetailsDisplay({ fineDetails }) {
           <span>{fineDetails.vehicleNumber}</span>
         </div>
         <div className="detail-row">
-          <label>Violation Type:</label>
-          <span>{fineDetails.violationType}</span>
+          <label>Offense:</label>
+          <span>{fineDetails.offense || fineDetails.violationType}</span>
         </div>
         <div className="detail-row">
           <label>Fine Amount:</label>
           <span className="amount">${fineDetails.amount}</span>
         </div>
         <div className="detail-row">
-          <label>Date of Violation:</label>
-          <span>{fineDetails.violationDate}</span>
+          <label>Date:</label>
+          <span>{fineDetails.date || fineDetails.violationDate}</span>
         </div>
         <div className="detail-row">
           <label>Status:</label>

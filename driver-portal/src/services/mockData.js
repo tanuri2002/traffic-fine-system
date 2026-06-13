@@ -39,8 +39,10 @@ export function getFineByReference(referenceNumber, categoryId) {
 export function processMockPayment(paymentData) {
   return new Promise((resolve) => {
     setTimeout(() => {
+      const receiptNumber = `RCPT-${Date.now()}`;
       const tx = {
-        transactionId: `MOCK-${Date.now()}`,
+        transactionId: receiptNumber,
+        receiptNumber,
         status: 'CONFIRMED',
         amount: paymentData.amount || 0
       };

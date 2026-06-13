@@ -35,6 +35,7 @@ function ReferenceForm() {
       const resp = await fineService.getFineDetails(formData.referenceNumber, formData.categoryId);
       if (resp?.data) {
         setFineData(resp.data);
+        sessionStorage.setItem('fineData', JSON.stringify(resp.data));
         toast.success('Fine details loaded');
         navigate('/details', { state: { fineDetails: resp.data } });
       } else if (resp?.error) {
@@ -44,6 +45,7 @@ function ReferenceForm() {
         // fallback: set minimal data so user can continue
         const fallback = { referenceNumber: formData.referenceNumber, status: 'unpaid', amount: 0 };
         setFineData(fallback);
+        sessionStorage.setItem('fineData', JSON.stringify(fallback));
         toast.info('Using fallback fine data');
         navigate('/details', { state: { fineDetails: fallback } });
       }

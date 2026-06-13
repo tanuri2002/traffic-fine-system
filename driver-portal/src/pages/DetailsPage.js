@@ -1,17 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DetailsDisplay from '../components/Display/DetailsDisplay';
+import AppContext from '../context/AppContext';
 import './DetailsPage.css';
 
 function DetailsPage() {
   const [fineDetails, setFineDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { fineData, setFineData } = useContext(AppContext);
 
   useEffect(() => {
-    // Load fine details from location state or session storage
-    // This will be implemented with actual API calls
-  }, []);
+    const stateFineDetails = location.state?.fineDetails;
+    const storedFineDetails = sessionStorage.getItem('fineData');
+
+    const resolvedFineDetails =
+      stateFineDetails ||
+      fineData ||
+      (storedFineDetails ? JSON.parse(storedFineDetails) : null);
+
+    if (resolvedFineDetails) {
+      setFineDetails(resolvedFineDetails);
+      setFineData(resolvedFineDetails);
+      sessionStorage.setItem('fineData', JSON.stringify(resolvedFineDetails));
+    }
+
+    setLoading(false);
+  }, [fineData, location.state, setFineData]);
 
   const handleProceedToPayment = () => {
     navigate('/payment', { state: { fineDetails } });
