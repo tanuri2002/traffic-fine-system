@@ -44,13 +44,13 @@ function DetailsPage() {
           <DetailsDisplay fineDetails={fineDetails} />
           <div className="button-group">
             <button 
-              className="btn-primary" 
+              className="details-btn btn-primary" 
               onClick={handleProceedToPayment}
             >
               Proceed to Payment
             </button>
             <button 
-              className="btn-secondary" 
+              className="details-btn btn-secondary" 
               onClick={() => navigate('/')}
             >
               Back
