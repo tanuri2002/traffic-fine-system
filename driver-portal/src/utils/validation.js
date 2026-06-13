@@ -13,19 +13,6 @@ export function validateCardNumber(card) {
   if (!card) return 'Card number is required.';
   const cleaned = card.replace(/\s+/g, '');
   if (!/^\d{13,19}$/.test(cleaned)) return 'Card number must be 13 to 19 digits.';
-  // Optional: Luhn check
-  let sum = 0;
-  let shouldDouble = false;
-  for (let i = cleaned.length - 1; i >= 0; i--) {
-    let digit = parseInt(cleaned.charAt(i), 10);
-    if (shouldDouble) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-    sum += digit;
-    shouldDouble = !shouldDouble;
-  }
-  if (sum % 10 !== 0) return 'Invalid card number.';
   return null;
 }
 
