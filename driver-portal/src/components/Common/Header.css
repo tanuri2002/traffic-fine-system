@@ -1,8 +1,11 @@
 .header {
-  background-color: #2c3e50;
+  background: rgba(18, 31, 50, 0.72);
   color: white;
   padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 24px rgba(10, 18, 32, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .header-container {
@@ -22,7 +25,7 @@
 }
 
 .logo:hover {
-  color: #3498db;
+  color: #9ad1ff;
 }
 
 .nav {
@@ -38,7 +41,7 @@
 }
 
 .nav a:hover {
-  color: #3498db;
+  color: #9ad1ff;
 }
 
 @media (max-width: 768px) {
