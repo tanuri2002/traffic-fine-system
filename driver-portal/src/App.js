@@ -11,10 +11,11 @@ import ConfirmationPage from './pages/ConfirmationPage';
 function AppLayout() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const showAppChrome = !isHomePage;
 
   return (
     <div className="App">
-      <Header />
+      {showAppChrome && <Header />}
       <main className={`main-content ${isHomePage ? 'main-content-home' : ''}`}>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -23,7 +24,7 @@ function AppLayout() {
           <Route path="/confirmation" element={<ConfirmationPage />} />
         </Routes>
       </main>
-      <Footer />
+      {showAppChrome && <Footer />}
     </div>
   );
 }

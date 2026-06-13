@@ -1,55 +1,82 @@
 .header {
-  background: rgba(18, 31, 50, 0.72);
+  background: rgba(4, 30, 78, 0.82);
   color: white;
-  padding: 1rem 0;
-  box-shadow: 0 6px 24px rgba(10, 18, 32, 0.18);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 1rem 2rem;
+  box-shadow: 0 8px 24px rgba(3, 14, 36, 0.24);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+.home-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1.5rem;
 }
 
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-decoration: none;
-  color: white;
-}
-
-.logo:hover {
-  color: #9ad1ff;
-}
-
-.nav {
+.home-brand {
   display: flex;
-  gap: 2rem;
+  align-items: center;
+  gap: 0.8rem;
 }
 
-.nav a {
+.home-brand-logo {
+  display: block;
+  width: 2.9rem;
+  height: 2.9rem;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.12rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+
+.home-brand-text h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+
+.home-brand-text p {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+.home-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+
+.home-nav-links a {
   text-decoration: none;
-  color: white;
+  color: rgba(255, 255, 255, 0.88);
   font-weight: 500;
-  transition: color 0.3s;
+  font-size: 0.92rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.3s, border-bottom-color 0.3s;
 }
 
-.nav a:hover {
-  color: #9ad1ff;
+.home-nav-links a:hover,
+.home-nav-links a.active {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
 }
 
 @media (max-width: 768px) {
-  .header-container {
-    padding: 0 1rem;
+  .header {
+    padding: 1rem;
   }
 
-  .nav {
+  .home-nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-nav-links {
     gap: 1rem;
   }
 }
