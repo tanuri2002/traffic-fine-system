@@ -4,10 +4,11 @@
 /// Author: Member 3
 /// Date: May 2026
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import '../models/fine_model.dart';
-import 'fine_details_screen.dart';
+import '../controllers/fine_controller.dart';
 
 // Sample fine data for testing
 final unpaidFine = Fine(
@@ -59,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _referenceNumberController = TextEditingController();
   final _categoryIdController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -68,64 +68,30 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  Fine _getFineByReference(String reference) {
-    /// Returns a sample `Fine` based on the provided reference number.
-    ///
-    /// This is a local test helper that maps well-known test references
-    /// to `unpaidFine`, `paidFine`, and `overdueFine`. If no match is
-    /// found, it returns a default `Fine` using the current form values.
-
-    if (reference == 'TF20240512345') {
-      return unpaidFine;
-    } else if (reference == 'TF20240423156') {
-      return paidFine;
-    } else if (reference == 'TF20240201789') {
-      return overdueFine;
-    }
-    // Default: return unpaid fine with entered reference
-    return Fine(
-      referenceNumber: _referenceNumberController.text,
-      categoryId: _categoryIdController.text,
-      driverName: 'Test User',
-      violationType: 'Test Violation',
-      amount: 5000.00,
-      dueDate: '2026-05-31',
-      status: 'Unpaid',
-      issuedDate: '2026-04-15',
-    );
-  }
-
-  void _checkFine() {
+  Future<void> _checkFine() async {
     /// Triggered when the user submits the lookup form.
     /// Validates inputs, shows a loading state, and navigates to
     /// `FineDetailsScreen`. In production this would call the backend.
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      final controller = context.read<FineController>();
+      await controller.searchFine(
+        _referenceNumberController.text,
+        _categoryIdController.text,
+      );
 
-      // TODO: Call API to fetch fine details
-      // For now, simulate a delay
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-
-          // Get fine based on reference number
-          final fine = _getFineByReference(
-            _referenceNumberController.text,
-          );
-
-          // Navigate to FineDetailsScreen
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FineDetailsScreen(fine: fine),
-            ),
-          );
+      if (!mounted) return;
+      if (controller.fine != null) {
+        Navigator.pushNamed(context, '/fineDetails', arguments: controller.fine);
+      } else if (controller.error != null) {
+        final err = controller.error!.toLowerCase();
+        if (err.contains('unauthorized')) {
+          Navigator.pushReplacementNamed(context, '/login');
+          return;
         }
-      });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(controller.error!)),
+        );
+      }
     }
   }
 
@@ -258,10 +224,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
 
                   // Check Fine Button
-                  CustomButton(
-                    text: 'Check Fine',
-                    onPressed: _checkFine,
-                    isLoading: _isLoading,
+                  Consumer<FineController>(
+                    builder: (context, controller, _) => CustomButton(
+                      text: 'Check Fine',
+                      onPressed: _checkFine,
+                      isLoading: controller.loading,
+                    ),
                   ),
 
                   const SizedBox(height: 24),

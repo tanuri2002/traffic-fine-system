@@ -1,0 +1,22 @@
+[
+  {
+    "referenceNumber": "TF20240512345",
+    "categoryId": "CAT001",
+    "driverName": "Nimal Perera",
+    "violationType": "Speed Limit Violation",
+    "amount": 5000.00,
+    "dueDate": "2026-05-31",
+    "status": "Unpaid",
+    "issuedDate": "2026-04-15"
+  },
+  {
+    "referenceNumber": "TF20240423156",
+    "categoryId": "CAT002",
+    "driverName": "Samantha Silva",
+    "violationType": "No Parking Zone",
+    "amount": 3500.00,
+    "dueDate": "2026-05-20",
+    "status": "Paid",
+    "issuedDate": "2026-03-20"
+  }
+]

@@ -3,12 +3,12 @@
 /// Author: Member 3
 /// Date: May 2026
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/fine_model.dart';
-import '../models/test_payment_cards.dart';
+import '../models/payment_model.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/payment_text_field.dart';
-import 'payment_success_screen.dart';
-import 'payment_failure_screen.dart';
+import '../controllers/fine_controller.dart';
 
 /// PaymentScreen
 ///
@@ -131,7 +131,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  void _processPayment() {
+  Future<void> _processPayment() async {
     /// Performs client-side checks, simulates processing and routes to
     /// the appropriate outcome screen. Uses `TestPaymentCards` to
     /// determine success/failure in development mode.
@@ -144,61 +144,55 @@ class _PaymentScreenState extends State<PaymentScreen> {
         );
         return;
       }
-
       setState(() {
         _isProcessing = true;
       });
 
-      // Simulate payment processing
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          setState(() {
-            _isProcessing = false;
+      final controller = Provider.of<FineController>(context, listen: false);
+
+      final paymentRequest = PaymentRequest(
+        fineReferenceNumber: widget.fine.referenceNumber,
+        categoryId: widget.fine.categoryId,
+        amount: widget.fine.amount,
+        cardNumber: _cardNumberController.text.replaceAll(' ', ''),
+        expiryDate: _expiryDateController.text,
+        cvv: _cvvController.text,
+        cardholderName: _cardholderNameController.text,
+      );
+
+      try {
+        final resp = await controller.pay(widget.fine.referenceNumber, paymentRequest);
+        if (!mounted) return;
+        setState(() {
+          _isProcessing = false;
+        });
+        if (resp != null && resp.success) {
+          Navigator.pushReplacementNamed(context, '/success', arguments: {
+            'fine': widget.fine,
+            'transactionId': resp.transactionId ?? 'unknown',
           });
-
-          // Check test card and process accordingly
-          final cleanedCardNumber =
-              _cardNumberController.text.replaceAll(' ', '');
-          final testCard = TestPaymentCards.getTestCard(cleanedCardNumber);
-          final transactionId = 'TXN${DateTime.now().millisecondsSinceEpoch}';
-
-          if (testCard != null && testCard.status == 'Success') {
-            // Success case
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentSuccessScreen(
-                  fine: widget.fine,
-                  transactionId: transactionId,
-                ),
-              ),
-            );
-          } else if (testCard != null) {
-            // Failure case
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentFailureScreen(
-                  fine: widget.fine,
-                  failureReason: testCard.status,
-                  transactionId: transactionId,
-                ),
-              ),
-            );
-          } else {
-            // Unknown card - simulate success
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentSuccessScreen(
-                  fine: widget.fine,
-                  transactionId: transactionId,
-                ),
-              ),
-            );
-          }
+        } else {
+          Navigator.pushReplacementNamed(context, '/failure', arguments: {
+            'fine': widget.fine,
+            'reason': resp?.message ?? controller.error ?? 'Payment failed',
+            'transactionId': resp?.transactionId ?? 'unknown',
+          });
         }
-      });
+      } catch (e) {
+        setState(() {
+          _isProcessing = false;
+        });
+        final err = e.toString();
+        if (err.toLowerCase().contains('unauthorized')) {
+          Navigator.pushReplacementNamed(context, '/login');
+          return;
+        }
+        Navigator.pushReplacementNamed(context, '/failure', arguments: {
+          'fine': widget.fine,
+          'reason': err,
+          'transactionId': 'unknown',
+        });
+      }
     }
   }
 
