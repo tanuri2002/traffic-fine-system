@@ -53,7 +53,8 @@ The schema is defined in [schema.sql](schema.sql). The app will also initialize 
 - `POST /api/auth/login` - log in and receive a JWT
 - `GET /api/categories` - list all categories
 - `POST /api/categories` - create a category, admin only
-- `GET /api/fines/lookup?referenceNumber=...&categoryCode=...` - look up a fine for online payment
+- `GET /api/fines/lookup?referenceNumber=...&categoryId=...` - look up a fine for online payment
+	- Backward compatible: `categoryCode` is also supported.
 - `POST /api/fines` - issue a fine, officer/admin only
 - `GET /api/fines/my` - list fines issued by the logged-in officer
 - `PATCH /api/fines/:referenceNumber/pay` - mark a fine as paid, admin only

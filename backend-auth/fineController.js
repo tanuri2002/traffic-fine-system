@@ -166,10 +166,10 @@ async function issueFine(req, res, next) {
 
 async function lookupFine(req, res, next) {
   try {
-    const { referenceNumber, categoryCode } = req.query;
+    const { referenceNumber, categoryCode, categoryId } = req.query;
 
-    if (!referenceNumber || !categoryCode) {
-      return res.status(400).json({ message: "referenceNumber and categoryCode are required" });
+    if (!referenceNumber || (!categoryCode && !categoryId)) {
+      return res.status(400).json({ message: "referenceNumber and either categoryCode or categoryId are required" });
     }
 
     const fine = await Fine.findFineByReferenceWithDetails(normalizeRef(referenceNumber));
@@ -178,7 +178,11 @@ async function lookupFine(req, res, next) {
       return res.status(404).json({ message: "Fine not found" });
     }
 
-    if (fine.category.code !== normalizeCode(categoryCode)) {
+    if (categoryCode && fine.category.code !== normalizeCode(categoryCode)) {
+      return res.status(404).json({ message: "Fine not found for this category" });
+    }
+
+    if (categoryId && Number(fine.category.id) !== Number(categoryId)) {
       return res.status(404).json({ message: "Fine not found for this category" });
     }
 

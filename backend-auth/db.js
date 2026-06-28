@@ -95,6 +95,19 @@ async function initDb() {
     `);
 
     await connection.query(`
+      CREATE TABLE IF NOT EXISTS app_users (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        full_name VARCHAR(150) NOT NULL,
+        username VARCHAR(80) NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_app_users_username (username)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS fines (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         reference_number VARCHAR(60) NOT NULL,
