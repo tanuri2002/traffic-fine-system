@@ -5,10 +5,25 @@ const { sendPaymentSMS } = require('../services/smsService');
 const processPayment = async (req, res) => {
   const { referenceNumber, paymentChannel } = req.body;
 
+  if (!referenceNumber || !paymentChannel) {
+    return res.status(400).json({ message: 'Missing referenceNumber or paymentChannel' });
+  }
+
   try {
+    // Check if the fine exists and get its status and officer's phone
+    const [rows] = await pool.query(
+      `SELECT status, officer_phone FROM fines WHERE reference_number = ?`,
+      [referenceNumber]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Fine not found' });
+    }
+
+    const fine = rows[0];
+
     // Check if already paid
-    const existing = await findPaymentByReference(referenceNumber);
-    if (existing) {
+    if (fine.status === 'PAID') {
       return res.status(400).json({ message: 'Fine already paid' });
     }
 
@@ -21,14 +36,9 @@ const processPayment = async (req, res) => {
     // Create payment record
     await createPayment(referenceNumber, paymentChannel);
 
-    // Get officer phone to send SMS
-    const [rows] = await pool.query(
-      `SELECT officer_phone FROM fines WHERE reference_number = ?`,
-      [referenceNumber]
-    );
-
-    if (rows.length > 0) {
-      await sendPaymentSMS(rows[0].officer_phone, referenceNumber);
+    // Send SMS notification to the traffic officer
+    if (fine.officer_phone) {
+      await sendPaymentSMS(fine.officer_phone, referenceNumber);
     }
 
     return res.status(200).json({ message: 'Payment successful. Officer notified via SMS.' });
