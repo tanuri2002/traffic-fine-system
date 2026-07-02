@@ -43,6 +43,42 @@ Optional admin bootstrap variables:
 - `SEED_ADMIN_DISTRICT`
 - `SEED_ADMIN_PASSWORD`
 
+## Team shared database setup
+
+Use a single central MySQL server for the team instead of `localhost` on one developer machine.
+
+1. Provision a shared MySQL instance (cloud VM, managed DB, or office server).
+2. Allow network access only from trusted team IPs.
+3. Create the database and a dedicated team user (do not use `root`):
+
+```sql
+CREATE DATABASE IF NOT EXISTS traffic_fine_auth;
+CREATE USER 'team_dev'@'%' IDENTIFIED BY 'strong_password_here';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, ALTER
+ON traffic_fine_auth.* TO 'team_dev'@'%';
+FLUSH PRIVILEGES;
+```
+
+4. Import [schema.sql](schema.sql) once on the shared server.
+5. Each teammate creates a local `.env` from `.env.example` and points it to the shared DB host:
+
+```env
+DB_HOST=shared-mysql-host-or-ip
+DB_PORT=3306
+DB_USER=team_dev
+DB_PASSWORD=strong_password_here
+DB_NAME=traffic_fine_auth
+```
+
+6. Start the service normally with `npm run dev`.
+
+Security notes:
+
+- Never commit `.env` to git.
+- Rotate credentials immediately if they are exposed.
+- Use different DB users/passwords for development and production.
+- Prefer SSL-enabled MySQL connections when available.
+
 ## Database schema
 
 The schema is defined in [schema.sql](schema.sql). The app will also initialize the same tables automatically when it starts.
