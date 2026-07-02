@@ -25,7 +25,8 @@ class AuthService {
 
   Future<bool> login(String username, String password) async {
     final resp = await http.post(
-      Uri.parse('\$baseUrl/auth/login'),
+      Uri.parse('$baseUrl/auth/login'),
+
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'username': username, 'password': password}),
     );
@@ -43,12 +44,38 @@ class AuthService {
     return false;
   }
 
+  Future<bool> register({
+    required String username,
+    required String password,
+    required String name,
+  }) async {
+    final resp = await http.post(
+      Uri.parse('$baseUrl/auth/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': username, 'password': password, 'name': name}),
+    );
+
+    if (resp.statusCode == 200 || resp.statusCode == 201) {
+      final Map<String, dynamic> body = jsonDecode(resp.body);
+      final token = body['token'] ?? body['access_token'];
+      final refresh = body['refresh_token'];
+      if (token != null) {
+        await saveToken(token);
+        if (refresh != null) await _storage.write(key: _refreshKey, value: refresh);
+        return true;
+      }
+      // If backend returns success without token, treat as failure for now.
+      return false;
+    }
+    return false;
+  }
+
   // Optional: try refresh flow if backend supports it
   Future<bool> tryRefresh() async {
     final refresh = await _storage.read(key: _refreshKey);
     if (refresh == null) return false;
     final resp = await http.post(
-      Uri.parse('\$baseUrl/auth/refresh'),
+      Uri.parse('$baseUrl/auth/refresh'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'refresh_token': refresh}),
     );

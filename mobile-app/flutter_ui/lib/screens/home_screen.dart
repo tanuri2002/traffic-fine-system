@@ -7,42 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import '../models/fine_model.dart';
 import '../controllers/fine_controller.dart';
-
-// Sample fine data for testing
-final unpaidFine = Fine(
-  referenceNumber: 'TF20240512345',
-  categoryId: 'CAT001',
-  driverName: 'Nimal Perera',
-  violationType: 'Speed Limit Violation',
-  amount: 5000.00,
-  dueDate: '2026-05-31',
-  status: 'Unpaid',
-  issuedDate: '2026-04-15',
-);
-
-final paidFine = Fine(
-  referenceNumber: 'TF20240423156',
-  categoryId: 'CAT002',
-  driverName: 'Samantha Silva',
-  violationType: 'No Parking Zone',
-  amount: 3500.00,
-  dueDate: '2026-05-20',
-  status: 'Paid',
-  issuedDate: '2026-03-20',
-);
-
-final overdueFine = Fine(
-  referenceNumber: 'TF20240201789',
-  categoryId: 'CAT003',
-  driverName: 'Rajith Kumar',
-  violationType: 'Traffic Light Violation',
-  amount: 7500.00,
-  dueDate: '2026-04-15',
-  status: 'Overdue',
-  issuedDate: '2026-02-15',
-);
 
 /// HomeScreen
 ///
@@ -223,6 +188,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
+                  // Auth shortcut
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/login');
+                      },
+                      child: const Text('Login'),
+                    ),
+                  ),
+
+
                   // Check Fine Button
                   Consumer<FineController>(
                     builder: (context, controller, _) => CustomButton(
@@ -231,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       isLoading: controller.loading,
                     ),
                   ),
+
 
                   const SizedBox(height: 24),
 

@@ -6,6 +6,7 @@ import 'screens/payment_screen.dart';
 import 'screens/payment_success_screen.dart';
 import 'screens/payment_failure_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 import 'models/fine_model.dart';
 import 'services/auth_service.dart';
 import 'services/api_service.dart';
@@ -15,11 +16,11 @@ import 'controllers/fine_controller.dart';
 
 void main() {
   // Use app config to select backend URLs.
-  // For now, defaults point to your local backend (auth:3000/4000 mismatch handled by config).
   final config = AppConfig.defaultLocal;
 
-  final auth = AuthService(baseUrl: config.authBaseUrl);
-  final api = ApiService(baseUrl: config.apiBaseUrl, authService: auth);
+  final auth = AuthService(baseUrl: config.baseUrl);
+  final api = ApiService(baseUrl: config.baseUrl, authService: auth);
+
   final fineController = FineController(apiService: api);
 
   runApp(
@@ -50,13 +51,15 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      initialRoute: '/',
+      initialRoute: '/login',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
             return MaterialPageRoute(builder: (_) => const HomeScreen());
           case '/login':
             return MaterialPageRoute(builder: (_) => const LoginScreen());
+          case '/register':
+            return MaterialPageRoute(builder: (_) => const RegisterScreen());
           case '/fineDetails':
             final args = settings.arguments;
             if (args is Fine) {

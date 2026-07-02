@@ -1,25 +1,20 @@
 import 'package:flutter/foundation.dart';
 
 class AppConfig {
-  final String authBaseUrl;
-  final String apiBaseUrl;
+  final String baseUrl;
 
   const AppConfig({
-    required this.authBaseUrl,
-    required this.apiBaseUrl,
+    required this.baseUrl,
   });
 
   static AppConfig fromEnv({
-    String? authBaseUrl,
-    String? apiBaseUrl,
+    String? baseUrl,
   }) {
-    // For now we keep it simple and fall back to your local backend defaults.
-    // If you later add dotenv/flutter_dotenv, map those values here.
     return AppConfig(
-      authBaseUrl: authBaseUrl ?? 'http://localhost:4000',
-      apiBaseUrl: apiBaseUrl ?? 'http://localhost:3000',
+      baseUrl: baseUrl ?? 'http://localhost:3000',
     );
   }
+
 
   static String? _constFromString(String? v) {
     final s = v?.trim();
@@ -27,16 +22,18 @@ class AppConfig {
     return s;
   }
 
+
   static AppConfig get defaultLocal {
-    return const AppConfig(authBaseUrl: 'http://localhost:4000', apiBaseUrl: 'http://localhost:3000');
+    return const AppConfig(baseUrl: 'http://localhost:3000');
   }
 
+
   @visibleForTesting
-  static AppConfig fromExplicitStrings({String? authUrl, String? apiUrl}) {
+  static AppConfig fromExplicitStrings({String? baseUrl}) {
     return AppConfig(
-      authBaseUrl: _constFromString(authUrl) ?? 'http://localhost:4000',
-      apiBaseUrl: _constFromString(apiUrl) ?? 'http://localhost:3000',
+      baseUrl: _constFromString(baseUrl) ?? 'http://localhost:3000',
     );
   }
 }
+
 
