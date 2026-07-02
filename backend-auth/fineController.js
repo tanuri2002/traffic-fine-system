@@ -16,6 +16,39 @@ function normalizeRef(value) {
     .toUpperCase();
 }
 
+function normalizeDateInput(value) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed.toISOString().slice(0, 19).replace("T", " ");
+}
+
+function resolvePaymentChannel(value) {
+  const normalized = normalizeCode(value);
+  if (normalized === "MOBILE" || normalized === "WEB") {
+    return normalized;
+  }
+
+  return null;
+}
+
+function sendPaymentNotificationToOfficer(fineWithDetails) {
+  if (!fineWithDetails || !fineWithDetails.officer) {
+    return;
+  }
+
+  // Placeholder hook for SMS integration; replace with SMS provider call.
+  console.log(
+    `Payment notification queued for officer ${fineWithDetails.officer.badgeNumber} (${fineWithDetails.officer.phone}) on fine ${fineWithDetails.referenceNumber}`
+  );
+}
+
 async function registerOfficer(req, res, next) {
   try {
     const { badgeNumber, name, phone, district, password } = req.body;
@@ -234,6 +267,118 @@ async function markFineAsPaid(req, res, next) {
   }
 }
 
+async function completeFinePayment(req, res, next) {
+  try {
+    const { referenceNumber, categoryCode, categoryId, channel } = req.body;
+
+    if (!referenceNumber || (!categoryCode && !categoryId)) {
+      return res.status(400).json({
+        message: "referenceNumber and either categoryCode or categoryId are required"
+      });
+    }
+
+    const paymentChannel = resolvePaymentChannel(channel);
+    if (!paymentChannel) {
+      return res.status(400).json({ message: "channel must be either MOBILE or WEB" });
+    }
+
+    const fine = await Fine.findFineByReferenceWithDetails(normalizeRef(referenceNumber));
+
+    if (!fine) {
+      return res.status(404).json({ message: "Fine not found" });
+    }
+
+    if (categoryCode && fine.category.code !== normalizeCode(categoryCode)) {
+      return res.status(404).json({ message: "Fine not found for this category" });
+    }
+
+    if (categoryId && Number(fine.category.id) !== Number(categoryId)) {
+      return res.status(404).json({ message: "Fine not found for this category" });
+    }
+
+    if (fine.status === "PAID") {
+      return res.status(200).json({
+        message: "Fine already paid",
+        fine: {
+          referenceNumber: fine.referenceNumber,
+          status: fine.status,
+          paidAt: fine.paidAt,
+          paymentChannel: fine.paymentChannel,
+          amountLkr: fine.category.amountLkr,
+          category: fine.category,
+          officer: fine.officer
+        }
+      });
+    }
+
+    await Fine.updateFineAsPaidIfUnpaid(fine.referenceNumber, paymentChannel);
+
+    const paidFine = await Fine.findPaidFineByReferenceWithDetails(fine.referenceNumber);
+    sendPaymentNotificationToOfficer(paidFine);
+
+    return res.status(200).json({
+      message: "Payment completed successfully",
+      fine: {
+        referenceNumber: paidFine.referenceNumber,
+        status: paidFine.status,
+        paidAt: paidFine.paidAt,
+        paymentChannel: paidFine.paymentChannel,
+        amountLkr: paidFine.category.amountLkr,
+        category: paidFine.category,
+        officer: paidFine.officer
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getDistrictCollections(req, res, next) {
+  try {
+    const startDate = normalizeDateInput(req.query.startDate);
+    const endDate = normalizeDateInput(req.query.endDate);
+
+    if ((req.query.startDate && !startDate) || (req.query.endDate && !endDate)) {
+      return res.status(400).json({ message: "Invalid startDate or endDate format" });
+    }
+
+    const rows = await Fine.getDistrictCollectionSummary({ startDate, endDate });
+
+    return res.status(200).json({
+      filters: {
+        startDate: startDate || null,
+        endDate: endDate || null
+      },
+      rows
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getCategoryCollections(req, res, next) {
+  try {
+    const startDate = normalizeDateInput(req.query.startDate);
+    const endDate = normalizeDateInput(req.query.endDate);
+
+    if ((req.query.startDate && !startDate) || (req.query.endDate && !endDate)) {
+      return res.status(400).json({ message: "Invalid startDate or endDate format" });
+    }
+
+    const rows = await Fine.getCategoryCollectionSummary({ startDate, endDate });
+
+    return res.status(200).json({
+      filters: {
+        startDate: startDate || null,
+        endDate: endDate || null
+      },
+      rows
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   registerOfficer,
   loginOfficer,
@@ -242,5 +387,8 @@ module.exports = {
   issueFine,
   lookupFine,
   listMyFines,
-  markFineAsPaid
+  markFineAsPaid,
+  completeFinePayment,
+  getDistrictCollections,
+  getCategoryCollections
 };
