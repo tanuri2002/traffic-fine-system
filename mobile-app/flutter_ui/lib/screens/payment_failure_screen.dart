@@ -213,15 +213,15 @@ class PaymentFailureScreen extends StatelessWidget {
                           label: 'Reference Number',
                           value: fine.referenceNumber,
                         ),
-                        const Divider(height: 16),
-                        _DetailRow(
-                          label: 'Driver Name',
-                          value: fine.driverName,
-                        ),
+                        // const Divider(height: 16),
+                        // _DetailRow(
+                        //   label: 'Driver Name',
+                        //   value: fine.driverName,
+                        // ),
                         const Divider(height: 16),
                         _DetailRow(
                           label: 'Amount Due',
-                          value: 'Rs. ${fine.amount.toStringAsFixed(2)}',
+                          value: 'Rs. ${fine.amountLkr.toStringAsFixed(2)}',
                           isHighlight: true,
                         ),
                       ],

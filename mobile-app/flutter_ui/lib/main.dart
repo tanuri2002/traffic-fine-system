@@ -8,7 +8,7 @@ import 'screens/payment_failure_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'models/fine_model.dart';
-import 'services/auth_service.dart';
+//import 'services/auth_service.dart';
 import 'services/api_service.dart';
 import 'services/config.dart';
 import 'controllers/fine_controller.dart';
@@ -17,17 +17,13 @@ import 'controllers/fine_controller.dart';
 void main() {
   // Use app config to select backend URLs.
   final config = AppConfig.defaultLocal;
-
-  final auth = AuthService(baseUrl: config.baseUrl);
-  final api = ApiService(baseUrl: config.baseUrl, authService: auth);
-
+  final api = ApiService(baseUrl: config.baseUrl);
   final fineController = FineController(apiService: api);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<FineController>.value(value: fineController),
-        Provider<AuthService>.value(value: auth),
         Provider<ApiService>.value(value: api),
       ],
       child: const MyApp(),
@@ -49,9 +45,10 @@ class MyApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF001F5C),
           elevation: 0,
+          titleTextStyle:const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       ),
-      initialRoute: '/login',
+      initialRoute: '/',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':

@@ -152,8 +152,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       final paymentRequest = PaymentRequest(
         fineReferenceNumber: widget.fine.referenceNumber,
-        categoryId: widget.fine.categoryId,
-        amount: widget.fine.amount,
+        categoryId: widget.fine.category.code,
+        amount: widget.fine.amountLkr,
         cardNumber: _cardNumberController.text.replaceAll(' ', ''),
         expiryDate: _expiryDateController.text,
         cvv: _cvvController.text,
@@ -331,7 +331,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Rs. ${widget.fine.amount.toStringAsFixed(2)}',
+                                'Rs. ${widget.fine.amountLkr.toStringAsFixed(2)}',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,

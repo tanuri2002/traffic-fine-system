@@ -48,11 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if (controller.fine != null) {
         Navigator.pushNamed(context, '/fineDetails', arguments: controller.fine);
       } else if (controller.error != null) {
-        final err = controller.error!.toLowerCase();
-        if (err.contains('unauthorized')) {
-          Navigator.pushReplacementNamed(context, '/login');
-          return;
-        }
+        //final err = controller.error!.toLowerCase();
+        // if (err.contains('unauthorized')) {
+        //   Navigator.pushReplacementNamed(context, '/login');
+        //   return;
+        // }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(controller.error!)),
         );
@@ -189,15 +189,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
 
                   // Auth shortcut
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/login');
-                      },
-                      child: const Text('Login'),
-                    ),
-                  ),
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: TextButton(
+                  //     onPressed: () {
+                  //       Navigator.pushNamed(context, '/login');
+                  //     },
+                  //     child: const Text('Login'),
+                  //   ),
+                  // ),
 
 
                   // Check Fine Button

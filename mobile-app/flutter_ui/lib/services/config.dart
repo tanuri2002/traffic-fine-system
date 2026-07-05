@@ -11,7 +11,7 @@ class AppConfig {
     String? baseUrl,
   }) {
     return AppConfig(
-      baseUrl: baseUrl ?? 'http://localhost:3000',
+      baseUrl: baseUrl ?? 'http://localhost:5001/api',
     );
   }
 
@@ -24,14 +24,14 @@ class AppConfig {
 
 
   static AppConfig get defaultLocal {
-    return const AppConfig(baseUrl: 'http://localhost:3000');
+    return const AppConfig(baseUrl: 'http://localhost:5001/api');
   }
 
 
   @visibleForTesting
   static AppConfig fromExplicitStrings({String? baseUrl}) {
     return AppConfig(
-      baseUrl: _constFromString(baseUrl) ?? 'http://localhost:3000',
+      baseUrl: _constFromString(baseUrl) ?? 'http://localhost:5001/api',
     );
   }
 }

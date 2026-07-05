@@ -91,6 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         elevation: 0,
         title: const Text('Register'),
         centerTitle: true,
+        titleTextStyle:const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
       ),
       body: SafeArea(
         child: Center(
