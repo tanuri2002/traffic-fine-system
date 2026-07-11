@@ -17,7 +17,10 @@ import 'controllers/fine_controller.dart';
 void main() {
   // Use app config to select backend URLs.
   final config = AppConfig.defaultLocal;
-  final api = ApiService(baseUrl: config.baseUrl);
+  final api = ApiService(
+  baseUrl: config.baseUrl,
+  paymentBaseUrl: 'http://10.0.2.2:3001', // backend-payment
+);
   final fineController = FineController(apiService: api);
 
   runApp(

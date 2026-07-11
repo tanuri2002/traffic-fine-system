@@ -4,9 +4,10 @@ import '../models/fine_model.dart';
 import '../models/payment_model.dart';
 
 class ApiService {
-  final String baseUrl; // e.g. http://10.0.2.2:5001/api
+  final String baseUrl;        // backend-auth, e.g. http://10.0.2.2:5001/api
+  final String paymentBaseUrl; // backend-payment, e.g. http://10.0.2.2:3001
 
-  ApiService({required this.baseUrl});
+  ApiService({required this.baseUrl, required this.paymentBaseUrl});
 
   Future<Fine> lookupFine(String referenceNumber, String categoryCode) async {
     final uri = Uri.parse('$baseUrl/fines/lookup').replace(queryParameters: {
@@ -27,15 +28,18 @@ class ApiService {
 
   Future<PaymentResponse> submitPayment(
       String referenceNumber, PaymentRequest details) async {
-    final uri = Uri.parse('$baseUrl/fines/$referenceNumber/pay');
+    final uri = Uri.parse('$paymentBaseUrl/pay');
 
-    final resp = await http.patch(
+    final resp = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(details.toJson()),
+      body: jsonEncode({
+        'referenceNumber': referenceNumber,
+        'paymentChannel': 'MOBILE',
+      }),
     );
 
-    if (resp.statusCode == 200 || resp.statusCode == 201) {
+    if (resp.statusCode == 200) {
       return PaymentResponse.fromJson(jsonDecode(resp.body));
     }
     throw Exception('Payment failed: ${resp.statusCode} - ${resp.body}');
