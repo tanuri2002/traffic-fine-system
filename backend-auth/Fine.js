@@ -1,5 +1,42 @@
 const { getPool } = require("./db");
 
+function trimString(value) {
+  return String(value || "").trim();
+}
+
+function normalizeReference(value) {
+  return trimString(value).toUpperCase();
+}
+
+function normalizeCode(value) {
+  return trimString(value).toUpperCase();
+}
+
+function createValidationError(message) {
+  const error = new Error(message);
+  error.statusCode = 400;
+  return error;
+}
+
+function isPositiveIntegerLike(value) {
+  if (value === undefined || value === null || value === "") {
+    return false;
+  }
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0;
+}
+
+function normalizePaymentChannel(value) {
+  const normalized = normalizeCode(value);
+
+  if (normalized === "MOBILE" || normalized === "WEB") {
+    return normalized;
+  }
+
+  return null;
+}
+
 function mapFine(row) {
   if (!row) {
     return null;
@@ -80,10 +117,18 @@ async function findFineByReferenceWithDetails(referenceNumber) {
 }
 
 async function createFine({ referenceNumber, categoryId, officerId, driverLicenseNo, vehicleNo }) {
+  const normalizedReferenceNumber = normalizeReference(referenceNumber);
+  const normalizedDriverLicenseNo = normalizeCode(driverLicenseNo);
+  const normalizedVehicleNo = normalizeCode(vehicleNo);
+
+  if (!normalizedReferenceNumber || !isPositiveIntegerLike(categoryId) || !isPositiveIntegerLike(officerId) || !normalizedDriverLicenseNo || !normalizedVehicleNo) {
+    throw createValidationError("Invalid fine payload");
+  }
+
   const [result] = await getPool().query(
     `INSERT INTO fines (reference_number, category_id, officer_id, driver_license_no, vehicle_no)
      VALUES (?, ?, ?, ?, ?)`,
-    [referenceNumber, categoryId, officerId, driverLicenseNo, vehicleNo]
+    [normalizedReferenceNumber, Number(categoryId), Number(officerId), normalizedDriverLicenseNo, normalizedVehicleNo]
   );
 
   const [rows] = await getPool().query("SELECT * FROM fines WHERE id = ? LIMIT 1", [result.insertId]);
@@ -120,22 +165,44 @@ async function listFinesByOfficerId(officerId) {
 }
 
 async function updateFineAsPaid(referenceNumber, paymentChannel) {
+  const normalizedReferenceNumber = normalizeReference(referenceNumber);
+  const normalizedPaymentChannel = normalizePaymentChannel(paymentChannel);
+
+  if (!normalizedReferenceNumber) {
+    throw createValidationError("Invalid reference number");
+  }
+
+  if (!normalizedPaymentChannel) {
+    throw createValidationError("Invalid payment channel");
+  }
+
   await getPool().query(
     `UPDATE fines
      SET status = 'PAID', payment_channel = ?, paid_at = NOW()
      WHERE reference_number = ?`,
-    [paymentChannel, referenceNumber]
+    [normalizedPaymentChannel, normalizedReferenceNumber]
   );
 
-  return findFineByReference(referenceNumber);
+  return findFineByReference(normalizedReferenceNumber);
 }
 
 async function updateFineAsPaidIfUnpaid(referenceNumber, paymentChannel) {
+  const normalizedReferenceNumber = normalizeReference(referenceNumber);
+  const normalizedPaymentChannel = normalizePaymentChannel(paymentChannel);
+
+  if (!normalizedReferenceNumber) {
+    throw createValidationError("Invalid reference number");
+  }
+
+  if (!normalizedPaymentChannel) {
+    throw createValidationError("Invalid payment channel");
+  }
+
   const [result] = await getPool().query(
     `UPDATE fines
      SET status = 'PAID', payment_channel = ?, paid_at = NOW()
      WHERE reference_number = ? AND status = 'UNPAID'`,
-    [paymentChannel, referenceNumber]
+    [normalizedPaymentChannel, normalizedReferenceNumber]
   );
 
   return result.affectedRows > 0;
