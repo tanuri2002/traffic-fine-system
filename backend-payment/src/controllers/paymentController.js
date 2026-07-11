@@ -12,7 +12,7 @@ const processPayment = async (req, res) => {
   try {
     // Check if the fine exists and get its status and officer's phone
     const [rows] = await pool.query(
-      `SELECT status, officer_phone FROM fines WHERE reference_number = ?`,
+      'SELECT f.status, o.phone AS officer_phone FROM fines f JOIN officers o ON o.id = f.officer_id WHERE f.reference_number = ?',
       [referenceNumber]
     );
 
