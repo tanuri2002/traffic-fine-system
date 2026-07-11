@@ -16,6 +16,33 @@ function normalizeRef(value) {
     .toUpperCase();
 }
 
+function trimString(value) {
+  return String(value || "").trim();
+}
+
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function parseAmountLkr(value) {
+  const amount = Number(value);
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return null;
+  }
+
+  return amount;
+}
+
+function isPositiveIntegerLike(value) {
+  if (value === undefined || value === null || value === "") {
+    return false;
+  }
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0;
+}
+
 function normalizeDateInput(value) {
   if (!value) {
     return null;
@@ -53,11 +80,11 @@ async function registerOfficer(req, res, next) {
   try {
     const { badgeNumber, name, phone, district, password } = req.body;
 
-    if (!badgeNumber || !name || !phone || !district || !password) {
+    if (!isNonEmptyString(badgeNumber) || !isNonEmptyString(name) || !isNonEmptyString(phone) || !isNonEmptyString(district) || !isNonEmptyString(password)) {
       return res.status(400).json({ message: "badgeNumber, name, phone, district, and password are required" });
     }
 
-    const normalizedBadgeNumber = badgeNumber.trim();
+    const normalizedBadgeNumber = trimString(badgeNumber);
     const existing = await Officer.findOfficerByBadgeNumber(normalizedBadgeNumber);
     if (existing) {
       return res.status(409).json({ message: "Officer already exists" });
@@ -67,9 +94,9 @@ async function registerOfficer(req, res, next) {
 
     const officer = await Officer.createOfficer({
       badgeNumber: normalizedBadgeNumber,
-      name: name.trim(),
-      phone: phone.trim(),
-      district: district.trim(),
+      name: trimString(name),
+      phone: trimString(phone),
+      district: trimString(district),
       passwordHash,
       role: "officer"
     });
@@ -88,11 +115,11 @@ async function loginOfficer(req, res, next) {
   try {
     const { badgeNumber, password } = req.body;
 
-    if (!badgeNumber || !password) {
+    if (!isNonEmptyString(badgeNumber) || !isNonEmptyString(password)) {
       return res.status(400).json({ message: "badgeNumber and password are required" });
     }
 
-    const officer = await Officer.findOfficerByBadgeNumber(badgeNumber.trim());
+    const officer = await Officer.findOfficerByBadgeNumber(trimString(badgeNumber));
     if (!officer) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -127,11 +154,14 @@ async function createCategory(req, res, next) {
   try {
     const { code, title, amountLkr, description } = req.body;
 
-    if (!code || !title || amountLkr === undefined) {
+    const normalizedCode = normalizeCode(code);
+    const normalizedTitle = trimString(title);
+    const parsedAmount = parseAmountLkr(amountLkr);
+
+    if (!normalizedCode || !normalizedTitle || parsedAmount === null) {
       return res.status(400).json({ message: "code, title, amountLkr are required" });
     }
 
-    const normalizedCode = normalizeCode(code);
     const existing = await Category.findCategoryByCode(normalizedCode);
     if (existing) {
       return res.status(409).json({ message: "Category already exists" });
@@ -139,9 +169,9 @@ async function createCategory(req, res, next) {
 
     const category = await Category.createCategory({
       code: normalizedCode,
-      title: title.trim(),
-      amountLkr: Number(amountLkr),
-      description: (description || "").trim()
+      title: normalizedTitle,
+      amountLkr: parsedAmount,
+      description: trimString(description)
     });
 
     return res.status(201).json(category);
@@ -163,7 +193,7 @@ async function issueFine(req, res, next) {
   try {
     const { referenceNumber, categoryCode, driverLicenseNo, vehicleNo } = req.body;
 
-    if (!referenceNumber || !categoryCode || !driverLicenseNo || !vehicleNo) {
+    if (!isNonEmptyString(referenceNumber) || !isNonEmptyString(categoryCode) || !isNonEmptyString(driverLicenseNo) || !isNonEmptyString(vehicleNo)) {
       return res.status(400).json({
         message: "referenceNumber, categoryCode, driverLicenseNo, vehicleNo are required"
       });
@@ -201,7 +231,7 @@ async function lookupFine(req, res, next) {
   try {
     const { referenceNumber, categoryCode, categoryId } = req.query;
 
-    if (!referenceNumber || (!categoryCode && !categoryId)) {
+    if (!isNonEmptyString(referenceNumber) || (!isNonEmptyString(categoryCode) && !isPositiveIntegerLike(categoryId))) {
       return res.status(400).json({ message: "referenceNumber and either categoryCode or categoryId are required" });
     }
 
@@ -215,7 +245,7 @@ async function lookupFine(req, res, next) {
       return res.status(404).json({ message: "Fine not found for this category" });
     }
 
-    if (categoryId && Number(fine.category.id) !== Number(categoryId)) {
+    if (isPositiveIntegerLike(categoryId) && Number(fine.category.id) !== Number(categoryId)) {
       return res.status(404).json({ message: "Fine not found for this category" });
     }
 
@@ -248,6 +278,14 @@ async function markFineAsPaid(req, res, next) {
     const referenceNumber = normalizeRef(req.params.referenceNumber);
     const { channel } = req.body;
 
+    if (!referenceNumber) {
+      return res.status(400).json({ message: "referenceNumber is required" });
+    }
+
+    if (channel !== undefined && channel !== null && !resolvePaymentChannel(channel)) {
+      return res.status(400).json({ message: "channel must be either MOBILE or WEB" });
+    }
+
     const fine = await Fine.findFineByReference(referenceNumber);
     if (!fine) {
       return res.status(404).json({ message: "Fine not found" });
@@ -257,7 +295,7 @@ async function markFineAsPaid(req, res, next) {
       return res.status(200).json({ message: "Fine already paid", fine });
     }
 
-    const paymentChannel = ["MOBILE", "WEB"].includes(channel) ? channel : "WEB";
+    const paymentChannel = resolvePaymentChannel(channel) || "WEB";
 
     const updatedFine = await Fine.updateFineAsPaid(referenceNumber, paymentChannel);
 
@@ -271,7 +309,7 @@ async function completeFinePayment(req, res, next) {
   try {
     const { referenceNumber, categoryCode, categoryId, channel } = req.body;
 
-    if (!referenceNumber || (!categoryCode && !categoryId)) {
+    if (!isNonEmptyString(referenceNumber) || (!isNonEmptyString(categoryCode) && !isPositiveIntegerLike(categoryId))) {
       return res.status(400).json({
         message: "referenceNumber and either categoryCode or categoryId are required"
       });
@@ -292,7 +330,7 @@ async function completeFinePayment(req, res, next) {
       return res.status(404).json({ message: "Fine not found for this category" });
     }
 
-    if (categoryId && Number(fine.category.id) !== Number(categoryId)) {
+    if (isPositiveIntegerLike(categoryId) && Number(fine.category.id) !== Number(categoryId)) {
       return res.status(404).json({ message: "Fine not found for this category" });
     }
 
