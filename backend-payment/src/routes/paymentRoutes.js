@@ -3,6 +3,6 @@ const router = express.Router();
 const { processPayment } = require('../controllers/paymentController');
 const { verifyToken } = require('../middleware/authMiddleware');
 
-router.post('/pay', verifyToken, processPayment);
+router.post('/pay', processPayment);
 
 module.exports = router;
