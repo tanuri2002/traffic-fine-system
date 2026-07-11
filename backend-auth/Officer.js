@@ -1,5 +1,15 @@
 const { getPool } = require("./db");
 
+function trimString(value) {
+  return String(value || "").trim();
+}
+
+function createValidationError(message) {
+  const error = new Error(message);
+  error.statusCode = 400;
+  return error;
+}
+
 function mapOfficer(row) {
   if (!row) {
     return null;
@@ -37,10 +47,24 @@ async function findOfficerById(id) {
 }
 
 async function createOfficer({ badgeNumber, name, phone, district, passwordHash, role }) {
+  const normalizedBadgeNumber = trimString(badgeNumber);
+  const normalizedName = trimString(name);
+  const normalizedPhone = trimString(phone);
+  const normalizedDistrict = trimString(district);
+  const normalizedRole = trimString(role);
+
+  if (!normalizedBadgeNumber || !normalizedName || !normalizedPhone || !normalizedDistrict || !passwordHash) {
+    throw createValidationError("Invalid officer payload");
+  }
+
+  if (normalizedRole !== "officer" && normalizedRole !== "admin") {
+    throw createValidationError("Invalid officer role");
+  }
+
   const [result] = await getPool().query(
     `INSERT INTO officers (badge_number, name, phone, district, password_hash, role)
      VALUES (?, ?, ?, ?, ?, ?)`,
-    [badgeNumber, name, phone, district, passwordHash, role]
+    [normalizedBadgeNumber, normalizedName, normalizedPhone, normalizedDistrict, passwordHash, normalizedRole]
   );
 
   return findOfficerById(result.insertId);
