@@ -22,3 +22,6 @@ Thumbs.db
 logs/
 *.log
 npm-debug.log*
+
+# Explicitly ignore service env files
+backend-auth/.env

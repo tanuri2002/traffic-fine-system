@@ -6,6 +6,8 @@ const fineRoutes = require("./fineRoutes");
 
 dotenv.config();
 
+const { getJwtSecret } = require("./jwtUtil");
+
 const app = express();
 app.use(express.json());
 
@@ -26,6 +28,14 @@ const port = process.env.PORT || 5001;
 
 async function startServer() {
   try {
+    // validate critical config early (will throw if missing or weak)
+    try {
+      getJwtSecret();
+    } catch (err) {
+      console.error("JWT configuration invalid:", err.message);
+      process.exit(1);
+    }
+
     await initDb();
     await seedInitialAdmin();
 
