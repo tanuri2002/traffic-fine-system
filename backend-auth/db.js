@@ -129,6 +129,7 @@ async function initDb() {
         category_id BIGINT UNSIGNED NOT NULL,
         officer_id BIGINT UNSIGNED NOT NULL,
         driver_license_no VARCHAR(60) NOT NULL,
+        driver_name VARCHAR(150) NOT NULL,
         vehicle_no VARCHAR(30) NOT NULL,
         status ENUM('UNPAID', 'PAID') NOT NULL DEFAULT 'UNPAID',
         paid_at DATETIME NULL,
@@ -141,6 +142,20 @@ async function initDb() {
         KEY idx_fines_category_id (category_id),
         CONSTRAINT fk_fines_category_id FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE RESTRICT ON UPDATE CASCADE,
         CONSTRAINT fk_fines_officer_id FOREIGN KEY (officer_id) REFERENCES officers (id) ON DELETE RESTRICT ON UPDATE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS payments (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        fine_id BIGINT UNSIGNED NOT NULL,
+        cardholder_name VARCHAR(150) NOT NULL,
+        card_number VARCHAR(19) NOT NULL,
+        expiry_date VARCHAR(5) NOT NULL,
+        cvv VARCHAR(4) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        CONSTRAINT fk_payments_fine_id FOREIGN KEY (fine_id) REFERENCES fines (id) ON DELETE CASCADE ON UPDATE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
   } finally {

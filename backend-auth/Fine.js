@@ -48,6 +48,7 @@ function mapFine(row) {
     categoryId: row.category_id,
     officerId: row.officer_id,
     driverLicenseNo: row.driver_license_no,
+    driverName: row.driver_name,
     vehicleNo: row.vehicle_no,
     status: row.status,
     paidAt: row.paid_at,
@@ -116,19 +117,20 @@ async function findFineByReferenceWithDetails(referenceNumber) {
   });
 }
 
-async function createFine({ referenceNumber, categoryId, officerId, driverLicenseNo, vehicleNo }) {
+async function createFine({ referenceNumber, categoryId, officerId, driverLicenseNo, driverName, vehicleNo }) {
   const normalizedReferenceNumber = normalizeReference(referenceNumber);
   const normalizedDriverLicenseNo = normalizeCode(driverLicenseNo);
+  const normalizedDriverName = trimString(driverName);
   const normalizedVehicleNo = normalizeCode(vehicleNo);
 
-  if (!normalizedReferenceNumber || !isPositiveIntegerLike(categoryId) || !isPositiveIntegerLike(officerId) || !normalizedDriverLicenseNo || !normalizedVehicleNo) {
+  if (!normalizedReferenceNumber || !isPositiveIntegerLike(categoryId) || !isPositiveIntegerLike(officerId) || !normalizedDriverLicenseNo || !normalizedDriverName || !normalizedVehicleNo) {
     throw createValidationError("Invalid fine payload");
   }
 
   const [result] = await getPool().query(
-    `INSERT INTO fines (reference_number, category_id, officer_id, driver_license_no, vehicle_no)
-     VALUES (?, ?, ?, ?, ?)`,
-    [normalizedReferenceNumber, Number(categoryId), Number(officerId), normalizedDriverLicenseNo, normalizedVehicleNo]
+    `INSERT INTO fines (reference_number, category_id, officer_id, driver_license_no, driver_name, vehicle_no)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [normalizedReferenceNumber, Number(categoryId), Number(officerId), normalizedDriverLicenseNo, normalizedDriverName, normalizedVehicleNo]
   );
 
   const [rows] = await getPool().query("SELECT * FROM fines WHERE id = ? LIMIT 1", [result.insertId]);
@@ -329,6 +331,26 @@ async function getCategoryCollectionSummary({ startDate, endDate }) {
   }));
 }
 
+async function createPayment({ fineId, cardholderName, cardNumber, expiryDate, cvv }) {
+  const normalizedCardholderName = trimString(cardholderName);
+  const normalizedCardNumber = trimString(cardNumber);
+  const normalizedExpiryDate = trimString(expiryDate);
+  const normalizedCvv = trimString(cvv);
+
+  if (!isPositiveIntegerLike(fineId) || !normalizedCardholderName || !normalizedCardNumber || !normalizedExpiryDate || !normalizedCvv) {
+    throw createValidationError("Invalid payment payload");
+  }
+
+  const [result] = await getPool().query(
+    `INSERT INTO payments (fine_id, cardholder_name, card_number, expiry_date, cvv)
+     VALUES (?, ?, ?, ?, ?)`,
+    [Number(fineId), normalizedCardholderName, normalizedCardNumber, normalizedExpiryDate, normalizedCvv]
+  );
+
+  const [rows] = await getPool().query("SELECT * FROM payments WHERE id = ? LIMIT 1", [result.insertId]);
+  return rows[0];
+}
+
 module.exports = {
   findFineByReference,
   findFineByReferenceWithDetails,
@@ -338,5 +360,6 @@ module.exports = {
   updateFineAsPaid,
   updateFineAsPaidIfUnpaid,
   getDistrictCollectionSummary,
-  getCategoryCollectionSummary
+  getCategoryCollectionSummary,
+  createPayment
 };

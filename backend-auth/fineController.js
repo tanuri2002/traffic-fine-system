@@ -201,11 +201,11 @@ async function listCategories(req, res, next) {
 
 async function issueFine(req, res, next) {
   try {
-    const { referenceNumber, categoryCode, driverLicenseNo, vehicleNo } = req.body;
+    const { referenceNumber, categoryCode, driverLicenseNo, driverName, vehicleNo } = req.body;
 
-    if (!isNonEmptyString(referenceNumber) || !isNonEmptyString(categoryCode) || !isNonEmptyString(driverLicenseNo) || !isNonEmptyString(vehicleNo)) {
+    if (!isNonEmptyString(referenceNumber) || !isNonEmptyString(categoryCode) || !isNonEmptyString(driverLicenseNo) || !isNonEmptyString(driverName) || !isNonEmptyString(vehicleNo)) {
       return res.status(400).json({
-        message: "referenceNumber, categoryCode, driverLicenseNo, vehicleNo are required"
+        message: "referenceNumber, categoryCode, driverLicenseNo, driverName, vehicleNo are required"
       });
     }
 
@@ -227,6 +227,7 @@ async function issueFine(req, res, next) {
       categoryId: category.id,
       officerId: req.user.officerId,
       driverLicenseNo: normalizeCode(driverLicenseNo),
+      driverName: trimString(driverName),
       vehicleNo: normalizeCode(vehicleNo)
     });
 
@@ -264,6 +265,7 @@ async function lookupFine(req, res, next) {
       status: fine.status,
       category: fine.category,
       amountLkr: fine.category.amountLkr,
+      driverName: fine.driverName,
       officer: fine.officer,
       issuedAt: fine.createdAt,
       paidAt: fine.paidAt
@@ -317,7 +319,7 @@ async function markFineAsPaid(req, res, next) {
 
 async function completeFinePayment(req, res, next) {
   try {
-    const { referenceNumber, categoryCode, categoryId, channel } = req.body;
+    const { referenceNumber, categoryCode, categoryId, channel, cardholderName, cardNumber, expiryDate, cvv } = req.body;
 
     if (!isNonEmptyString(referenceNumber) || (!isNonEmptyString(categoryCode) && !isPositiveIntegerLike(categoryId))) {
       return res.status(400).json({
@@ -328,6 +330,25 @@ async function completeFinePayment(req, res, next) {
     const paymentChannel = resolvePaymentChannel(channel);
     if (!paymentChannel) {
       return res.status(400).json({ message: "channel must be either MOBILE or WEB" });
+    }
+
+    if (!isNonEmptyString(cardholderName)) {
+      return res.status(400).json({ message: "cardholderName is required" });
+    }
+
+    const cardNumberRegex = /^\d{13,19}$/;
+    if (!isNonEmptyString(cardNumber) || !cardNumberRegex.test(cardNumber.replace(/\s+/g, ""))) {
+      return res.status(400).json({ message: "Invalid card number format" });
+    }
+
+    const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+    if (!isNonEmptyString(expiryDate) || !expiryRegex.test(expiryDate.trim())) {
+      return res.status(400).json({ message: "Invalid expiry date format. Expected MM/YY" });
+    }
+
+    const cvvRegex = /^\d{3,4}$/;
+    if (!isNonEmptyString(cvv) || !cvvRegex.test(cvv.trim())) {
+      return res.status(400).json({ message: "Invalid CVV format" });
     }
 
     const fine = await Fine.findFineByReferenceWithDetails(normalizeRef(referenceNumber));
@@ -360,6 +381,13 @@ async function completeFinePayment(req, res, next) {
     }
 
     await Fine.updateFineAsPaidIfUnpaid(fine.referenceNumber, paymentChannel);
+    await Fine.createPayment({
+      fineId: fine.id,
+      cardholderName,
+      cardNumber: cardNumber.replace(/\s+/g, ""),
+      expiryDate: expiryDate.trim(),
+      cvv: cvv.trim()
+    });
 
     const paidFine = await Fine.findPaidFineByReferenceWithDetails(fine.referenceNumber);
     sendPaymentNotificationToOfficer(paidFine);
