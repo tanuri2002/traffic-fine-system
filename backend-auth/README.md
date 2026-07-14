@@ -8,6 +8,7 @@ MySQL-backed REST API for the traffic fine system. This service handles JWT auth
 - Creates the required tables automatically on startup.
 - Issues JWT tokens for authenticated requests.
 - Lets officers register and log in.
+- Verifies officer registration against the admin-maintained officer registry.
 - Lets admins create fine categories and mark fines as paid.
 
 ## From-zero setup
@@ -42,6 +43,11 @@ Optional admin bootstrap variables:
 - `SEED_ADMIN_PHONE`
 - `SEED_ADMIN_DISTRICT`
 - `SEED_ADMIN_PASSWORD`
+
+Admin officer registry:
+
+- The `officer_registry` table is the admin-approved source of truth for officer identity.
+- An officer can register only if the submitted badge number, name, phone, and district match an active registry record.
 
 ## Team shared database setup
 

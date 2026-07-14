@@ -85,6 +85,16 @@ async function registerOfficer(req, res, next) {
     }
 
     const normalizedBadgeNumber = trimString(badgeNumber);
+    const registryOfficer = await Officer.findOfficerRegistryByBadgeNumber(normalizedBadgeNumber);
+
+    if (!registryOfficer) {
+      return res.status(403).json({ message: "Officer details are not approved by admin" });
+    }
+
+    if (registryOfficer.name !== trimString(name) || registryOfficer.phone !== trimString(phone) || registryOfficer.district !== trimString(district)) {
+      return res.status(403).json({ message: "Officer details do not match the admin registry" });
+    }
+
     const existing = await Officer.findOfficerByBadgeNumber(normalizedBadgeNumber);
     if (existing) {
       return res.status(409).json({ message: "Officer already exists" });
@@ -417,6 +427,92 @@ async function getCategoryCollections(req, res, next) {
   }
 }
 
+async function listOfficerRegistry(req, res, next) {
+  try {
+    const registry = await Officer.listOfficerRegistry();
+    return res.status(200).json(registry);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getOfficerRegistryEntry(req, res, next) {
+  try {
+    const id = req.params.id;
+    if (!isPositiveIntegerLike(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    const entry = await Officer.findOfficerRegistryById(id);
+    if (!entry) {
+      return res.status(404).json({ message: "Officer registry entry not found" });
+    }
+
+    return res.status(200).json(entry);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function createOfficerRegistryEntry(req, res, next) {
+  try {
+    const { badgeNumber, name, phone, district, active } = req.body;
+
+    if (!isNonEmptyString(badgeNumber) || !isNonEmptyString(name) || !isNonEmptyString(phone) || !isNonEmptyString(district)) {
+      return res.status(400).json({ message: "badgeNumber, name, phone, and district are required" });
+    }
+
+    const entry = await Officer.createOfficerRegistry({
+      badgeNumber,
+      name,
+      phone,
+      district,
+      active
+    });
+
+    return res.status(201).json(entry);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function updateOfficerRegistryEntry(req, res, next) {
+  try {
+    const id = req.params.id;
+    if (!isPositiveIntegerLike(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    const { badgeNumber, name, phone, district, active } = req.body;
+
+    const entry = await Officer.updateOfficerRegistry(id, {
+      badgeNumber,
+      name,
+      phone,
+      district,
+      active
+    });
+
+    return res.status(200).json(entry);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function deleteOfficerRegistryEntry(req, res, next) {
+  try {
+    const id = req.params.id;
+    if (!isPositiveIntegerLike(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    await Officer.deleteOfficerRegistry(id);
+    return res.status(200).json({ message: "Officer registry entry deleted successfully" });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   registerOfficer,
   loginOfficer,
@@ -428,5 +524,11 @@ module.exports = {
   markFineAsPaid,
   completeFinePayment,
   getDistrictCollections,
-  getCategoryCollections
+  getCategoryCollections,
+  listOfficerRegistry,
+  getOfficerRegistryEntry,
+  createOfficerRegistryEntry,
+  updateOfficerRegistryEntry,
+  deleteOfficerRegistryEntry
 };
+
