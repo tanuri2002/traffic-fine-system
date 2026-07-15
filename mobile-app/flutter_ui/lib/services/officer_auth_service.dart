@@ -1,0 +1,74 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+class OfficerAuthService {
+  // TODO: replace with the real backend base URL once backend-auth exists
+  static const String baseUrl = 'http://10.0.2.2:5001/api';
+  static const String _tokenKey = 'officer_jwt_token';
+
+  Future<bool> login(String officerId, String password) async {
+    try {
+      final resp = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'badgeNumber': officerId, 'password': password}),
+      );
+
+      if (resp.statusCode == 200) {
+        final body = jsonDecode(resp.body);
+        final token = body['token'] ?? body['accessToken'];
+        if (token != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(_tokenKey, token);
+          return true;
+        }
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+  }
+
+  Future<Map<String, dynamic>?> submitFine({
+    required String categoryId,
+    required String vehicleNo,
+    required double fee,
+  }) async {
+    final token = await getToken();
+    if (token == null) return null;
+
+    try {
+      final resp = await http.post(
+        Uri.parse('$baseUrl/fines'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'categoryId': categoryId,
+          'vehicleNo': vehicleNo,
+          'fee': fee,
+        }),
+      );
+
+      if (resp.statusCode == 200 || resp.statusCode == 201) {
+        return jsonDecode(resp.body);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+}
