@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
+const isMockAuth = process.env.REACT_APP_MOCK_AUTH === 'true';
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -12,18 +14,23 @@ export function AuthProvider({ children }) {
     const storedToken = localStorage.getItem('officerToken');
     const storedOfficer = localStorage.getItem('officerData');
     if (storedToken && storedOfficer) {
-      try {
-        const decoded = jwtDecode(storedToken);
-        if (decoded.exp * 1000 > Date.now()) {
-          setToken(storedToken);
-          setOfficer(JSON.parse(storedOfficer));
-        } else {
+      if (isMockAuth) {
+        setToken(storedToken);
+        setOfficer(JSON.parse(storedOfficer));
+      } else {
+        try {
+          const decoded = jwtDecode(storedToken);
+          if (decoded.exp * 1000 > Date.now()) {
+            setToken(storedToken);
+            setOfficer(JSON.parse(storedOfficer));
+          } else {
+            localStorage.removeItem('officerToken');
+            localStorage.removeItem('officerData');
+          }
+        } catch {
           localStorage.removeItem('officerToken');
           localStorage.removeItem('officerData');
         }
-      } catch {
-        localStorage.removeItem('officerToken');
-        localStorage.removeItem('officerData');
       }
     }
     setLoading(false);

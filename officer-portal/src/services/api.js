@@ -24,10 +24,27 @@ apiClient.interceptors.response.use(
   }
 );
 
-export const authService = {
-  login: (badgeNumber, password) =>
-    authClient.post('/officer/login', { badgeNumber, password }),
-};
+const isMockAuth = process.env.REACT_APP_MOCK_AUTH === 'true';
+
+export const authService = isMockAuth
+  ? {
+      login: (badgeNumber, password) =>
+        // simple mock response matching real API shape
+        Promise.resolve({
+          data: {
+            token: 'dev-mock-token',
+            officer: {
+              id: 'dev-officer',
+              name: 'Dev Officer',
+              badgeNumber: badgeNumber || 'DEV000',
+            },
+          },
+        }),
+    }
+  : {
+      login: (badgeNumber, password) =>
+        authClient.post('/officer/login', { badgeNumber, password }),
+    };
 
 export const fineService = {
   createFine: (fineData) => apiClient.post('/fines', fineData),
