@@ -97,6 +97,7 @@ The schema is defined in [schema.sql](schema.sql). The app will also initialize 
 - `POST /api/categories` - create a category, admin only
 - `GET /api/fines/lookup?referenceNumber=...&categoryId=...` - look up a fine for online payment
 	- Backward compatible: `categoryCode` is also supported.
+- The lookup response includes the receipt fields needed by the user screen: `referenceNumber`, `driverName`, `vehicleNo`, `offense`, `fineAmount`, `date`, `status`, `paidAt`, and `paymentChannel`.
 - `POST /api/fines` - issue a fine, officer/admin only
 - `GET /api/fines/my` - list fines issued by the logged-in officer
 - `PATCH /api/fines/:referenceNumber/pay` - mark a fine as paid, admin only

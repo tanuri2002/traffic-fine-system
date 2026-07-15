@@ -65,6 +65,26 @@ function resolvePaymentChannel(value) {
   return null;
 }
 
+function formatFinePaymentResponse(fine) {
+  if (!fine) {
+    return null;
+  }
+
+  return {
+    referenceNumber: fine.referenceNumber,
+    driverName: fine.driverName,
+    vehicleNo: fine.vehicleNo,
+    offense: fine.category ? fine.category.title : null,
+    fineAmount: fine.category ? fine.category.amountLkr : null,
+    date: fine.createdAt,
+    status: fine.status,
+    paidAt: fine.paidAt,
+    paymentChannel: fine.paymentChannel,
+    category: fine.category,
+    officer: fine.officer
+  };
+}
+
 function sendPaymentNotificationToOfficer(fineWithDetails) {
   if (!fineWithDetails || !fineWithDetails.officer) {
     return;
@@ -261,14 +281,9 @@ async function lookupFine(req, res, next) {
     }
 
     return res.status(200).json({
-      referenceNumber: fine.referenceNumber,
-      status: fine.status,
-      category: fine.category,
+      ...formatFinePaymentResponse(fine),
       amountLkr: fine.category.amountLkr,
-      driverName: fine.driverName,
-      officer: fine.officer,
-      issuedAt: fine.createdAt,
-      paidAt: fine.paidAt
+      issuedAt: fine.createdAt
     });
   } catch (error) {
     return next(error);
@@ -368,15 +383,7 @@ async function completeFinePayment(req, res, next) {
     if (fine.status === "PAID") {
       return res.status(200).json({
         message: "Fine already paid",
-        fine: {
-          referenceNumber: fine.referenceNumber,
-          status: fine.status,
-          paidAt: fine.paidAt,
-          paymentChannel: fine.paymentChannel,
-          amountLkr: fine.category.amountLkr,
-          category: fine.category,
-          officer: fine.officer
-        }
+        fine: formatFinePaymentResponse(fine)
       });
     }
 
@@ -394,15 +401,7 @@ async function completeFinePayment(req, res, next) {
 
     return res.status(200).json({
       message: "Payment completed successfully",
-      fine: {
-        referenceNumber: paidFine.referenceNumber,
-        status: paidFine.status,
-        paidAt: paidFine.paidAt,
-        paymentChannel: paidFine.paymentChannel,
-        amountLkr: paidFine.category.amountLkr,
-        category: paidFine.category,
-        officer: paidFine.officer
-      }
+      fine: formatFinePaymentResponse(paidFine)
     });
   } catch (error) {
     return next(error);
