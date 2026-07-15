@@ -11,6 +11,7 @@ function mapFine(row) {
     categoryId: row.category_id,
     officerId: row.officer_id,
     driverLicenseNo: row.driver_license_no,
+    driverName: row.driver_name,
     vehicleNo: row.vehicle_no,
     status: row.status,
     paidAt: row.paid_at,
@@ -79,11 +80,11 @@ async function findFineByReferenceWithDetails(referenceNumber) {
   });
 }
 
-async function createFine({ referenceNumber, categoryId, officerId, driverLicenseNo, vehicleNo }) {
+async function createFine({ referenceNumber, categoryId, officerId, driverLicenseNo, driverName, vehicleNo }) {
   const [result] = await getPool().query(
-    `INSERT INTO fines (reference_number, category_id, officer_id, driver_license_no, vehicle_no)
-     VALUES (?, ?, ?, ?, ?)`,
-    [referenceNumber, categoryId, officerId, driverLicenseNo, vehicleNo]
+    `INSERT INTO fines (reference_number, category_id, officer_id, driver_license_no, driver_name, vehicle_no)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [referenceNumber, categoryId, officerId, driverLicenseNo, driverName, vehicleNo]
   );
 
   const [rows] = await getPool().query("SELECT * FROM fines WHERE id = ? LIMIT 1", [result.insertId]);

@@ -16,6 +16,10 @@ function normalizeRef(value) {
     .toUpperCase();
 }
 
+function generateReferenceNumber() {
+  return `REF-${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
+}
+
 async function registerOfficer(req, res, next) {
   try {
     const { badgeNumber, name, phone, district, password } = req.body;
@@ -44,7 +48,12 @@ async function registerOfficer(req, res, next) {
     return res.status(201).json({
       id: officer.id,
       badgeNumber: officer.badgeNumber,
-      role: officer.role
+      name: officer.name,
+      phone: officer.phone,
+      district: officer.district,
+      role: officer.role,
+      createdAt: officer.createdAt,
+      updatedAt: officer.updatedAt
     });
   } catch (error) {
     return next(error);
@@ -81,6 +90,7 @@ async function loginOfficer(req, res, next) {
         id: officer.id,
         badgeNumber: officer.badgeNumber,
         name: officer.name,
+        phone: officer.phone,
         district: officer.district,
         role: officer.role
       }
@@ -128,16 +138,27 @@ async function listCategories(req, res, next) {
 
 async function issueFine(req, res, next) {
   try {
-    const { referenceNumber, categoryCode, driverLicenseNo, vehicleNo } = req.body;
+    const {
+      referenceNumber,
+      categoryCode,
+      categoryId,
+      driverLicenseNo,
+      driverName,
+      vehicleNo,
+      fee
+    } = req.body;
 
-    if (!referenceNumber || !categoryCode || !driverLicenseNo || !vehicleNo) {
+    const normalizedCategoryCode = normalizeCode(categoryCode || categoryId);
+    const normalizedReference = normalizeRef(referenceNumber || generateReferenceNumber());
+    const normalizedVehicleNo = normalizeCode(vehicleNo);
+    const normalizedDriverLicenseNo = normalizeCode(driverLicenseNo || "UNKNOWN");
+    const normalizedDriverName = String(driverName || "UNKNOWN").trim() || "UNKNOWN";
+
+    if (!normalizedCategoryCode || !normalizedVehicleNo) {
       return res.status(400).json({
-        message: "referenceNumber, categoryCode, driverLicenseNo, vehicleNo are required"
+        message: "categoryCode/categoryId and vehicleNo are required"
       });
     }
-
-    const normalizedReference = normalizeRef(referenceNumber);
-    const normalizedCategoryCode = normalizeCode(categoryCode);
 
     const existingFine = await Fine.findFineByReference(normalizedReference);
     if (existingFine) {
@@ -153,8 +174,9 @@ async function issueFine(req, res, next) {
       referenceNumber: normalizedReference,
       categoryId: category.id,
       officerId: req.user.officerId,
-      driverLicenseNo: normalizeCode(driverLicenseNo),
-      vehicleNo: normalizeCode(vehicleNo)
+      driverLicenseNo: normalizedDriverLicenseNo,
+      driverName: normalizedDriverName,
+      vehicleNo: normalizedVehicleNo
     });
 
     const fineWithDetails = await Fine.findFineByReferenceWithDetails(fine.referenceNumber);

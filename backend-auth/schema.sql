@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS fines (
   category_id BIGINT UNSIGNED NOT NULL,
   officer_id BIGINT UNSIGNED NOT NULL,
   driver_license_no VARCHAR(60) NOT NULL,
+  driver_name VARCHAR(150) NOT NULL,
   vehicle_no VARCHAR(30) NOT NULL,
   status ENUM('UNPAID', 'PAID') NOT NULL DEFAULT 'UNPAID',
   paid_at DATETIME NULL,

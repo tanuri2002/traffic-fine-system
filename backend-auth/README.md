@@ -56,6 +56,8 @@ The schema is defined in [schema.sql](schema.sql). The app will also initialize 
 - `GET /api/fines/lookup?referenceNumber=...` - look up a fine for online payment
 	- `categoryId` and `categoryCode` are accepted as optional hints, but the fine is resolved by reference number.
 - `POST /api/fines` - issue a fine, officer/admin only
+	- Accepts `categoryCode` or `categoryId`; if `referenceNumber` is omitted, the backend generates one.
+	- `driverLicenseNo` and `driverName` default to `UNKNOWN` when not supplied by the client.
 - `GET /api/fines/my` - list fines issued by the logged-in officer
 - `PATCH /api/fines/:referenceNumber/pay` - mark a fine as paid, admin only
 
