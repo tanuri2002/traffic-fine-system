@@ -5,7 +5,7 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-container">
-        <p>&copy; 2024 Traffic Fine Management System — Officer Portal.</p>
+        <p>&copy; 2026 Traffic Fine Management System — Officer Portal.</p>
       </div>
     </footer>
   );

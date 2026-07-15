@@ -46,7 +46,7 @@ function DashboardPage() {
             <span className="section-eyebrow">Profile summary</span>
             <h2>Officer details</h2>
           </div>
-          <p>Current officer information shown for quick reference.</p>
+          
         </div>
 
         <div className="dashboard-grid">

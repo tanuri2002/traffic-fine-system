@@ -8,8 +8,8 @@ function LoginPage() {
       <section className="hero-section login-hero">
         <div className="hero-copy">
           <div className="hero-badge">Officer Portal</div>
-          <h2>Sign In to Manage Traffic Fines</h2>
-          <p>Enter your badge number and password to access your dashboard and create fines.</p>
+          <h2>Sign In to the Officer Portal</h2>
+          <p>Enter your badge number and password to issue and manage traffic fines.</p>
         </div>
 
         <div className="hero-form-card">
