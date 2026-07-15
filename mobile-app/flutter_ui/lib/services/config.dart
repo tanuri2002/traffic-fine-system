@@ -2,16 +2,20 @@ import 'package:flutter/foundation.dart';
 
 class AppConfig {
   final String baseUrl;
+  final String paymentBaseUrl;
 
   const AppConfig({
     required this.baseUrl,
+    required this.paymentBaseUrl,
   });
 
   static AppConfig fromEnv({
     String? baseUrl,
+    String? paymentBaseUrl,
   }) {
     return AppConfig(
       baseUrl: baseUrl ?? 'http://localhost:5001/api',
+      paymentBaseUrl: paymentBaseUrl ?? 'http://localhost:3001',
     );
   }
 
@@ -24,14 +28,18 @@ class AppConfig {
 
 
   static AppConfig get defaultLocal {
-    return const AppConfig(baseUrl: 'http://localhost:5001/api');
+    return const AppConfig(
+      baseUrl: 'http://localhost:5001/api',
+      paymentBaseUrl: 'http://localhost:3001',
+    );
   }
 
 
   @visibleForTesting
-  static AppConfig fromExplicitStrings({String? baseUrl}) {
+  static AppConfig fromExplicitStrings({String? baseUrl, String? paymentBaseUrl}) {
     return AppConfig(
       baseUrl: _constFromString(baseUrl) ?? 'http://localhost:5001/api',
+      paymentBaseUrl: _constFromString(paymentBaseUrl) ?? 'http://localhost:3001',
     );
   }
 }

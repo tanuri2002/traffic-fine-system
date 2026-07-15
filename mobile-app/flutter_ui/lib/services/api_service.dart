@@ -28,7 +28,7 @@ class ApiService {
 
   Future<PaymentResponse> submitPayment(
       String referenceNumber, PaymentRequest details) async {
-    final uri = Uri.parse('$paymentBaseUrl/pay');
+    final uri = Uri.parse('$paymentBaseUrl/api/payment/pay');
 
     final resp = await http.post(
       uri,
