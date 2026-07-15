@@ -3,6 +3,7 @@ import {
   FaHome,
   FaChartBar,
   FaList,
+  FaTable,
   FaSignOutAlt,
 } from "react-icons/fa";
 
@@ -25,6 +26,11 @@ function Sidebar() {
       name: "Categories",
       path: "/category-breakdown",
       icon: <FaList />,
+    },
+    {
+      name: "Officer Registry",
+      path: "/admin-table",
+      icon: <FaTable />,
     },
   ];
 
