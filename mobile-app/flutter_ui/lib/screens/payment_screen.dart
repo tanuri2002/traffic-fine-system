@@ -270,9 +270,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     // Secure Gateway Badge
                     Center(
                       child: Chip(
-                        label: Row(
+                        label: const Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.lock,
                               color: Colors.green,

@@ -168,22 +168,14 @@ async function lookupFine(req, res, next) {
   try {
     const { referenceNumber, categoryCode, categoryId } = req.query;
 
-    if (!referenceNumber || (!categoryCode && !categoryId)) {
-      return res.status(400).json({ message: "referenceNumber and either categoryCode or categoryId are required" });
+    if (!referenceNumber) {
+      return res.status(400).json({ message: "referenceNumber is required" });
     }
 
     const fine = await Fine.findFineByReferenceWithDetails(normalizeRef(referenceNumber));
 
     if (!fine) {
       return res.status(404).json({ message: "Fine not found" });
-    }
-
-    if (categoryCode && fine.category.code !== normalizeCode(categoryCode)) {
-      return res.status(404).json({ message: "Fine not found for this category" });
-    }
-
-    if (categoryId && Number(fine.category.id) !== Number(categoryId)) {
-      return res.status(404).json({ message: "Fine not found for this category" });
     }
 
     return res.status(200).json({
@@ -193,7 +185,9 @@ async function lookupFine(req, res, next) {
       amountLkr: fine.category.amountLkr,
       officer: fine.officer,
       issuedAt: fine.createdAt,
-      paidAt: fine.paidAt
+      paidAt: fine.paidAt,
+      requestedCategoryCode: categoryCode || null,
+      requestedCategoryId: categoryId || null
     });
   } catch (error) {
     return next(error);
