@@ -9,6 +9,7 @@ import ProtectedRoute from './components/Common/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import CreateFinePage from './pages/CreateFinePage';
+import CreateOfficerPage from './pages/CreateOfficerPage';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/create-fine" element={<ProtectedRoute><CreateFinePage /></ProtectedRoute>} />
+              <Route path="/create-officer" element={<CreateOfficerPage />} />
               <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             </Routes>
           </main>

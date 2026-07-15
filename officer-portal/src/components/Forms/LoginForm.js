@@ -92,6 +92,18 @@ function LoginForm() {
           Sign in as demo
         </button>
       )}
+      {isMockAuth && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => navigate('/create-officer')}
+            style={{ padding: '0.5rem 0.75rem', fontSize: '0.95rem' }}
+          >
+            New officer? Create account
+          </button>
+        </div>
+      )}
     </form>
   );
 }

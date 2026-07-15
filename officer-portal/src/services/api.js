@@ -36,7 +36,10 @@ if (isMockAuth) {
 export const authService = isMockAuth
   ? {
       login: (badgeNumber, password) => {
-        const user = mockUsers.find((u) => u.badgeNumber === badgeNumber);
+        // include any created mock users stored in localStorage
+        const stored = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+        const users = [...mockUsers, ...stored];
+        const user = users.find((u) => u.badgeNumber === badgeNumber);
         if (!user) {
           return Promise.reject({ response: { status: 401, data: { message: 'Officer not found' } } });
         }
@@ -54,9 +57,30 @@ export const authService = isMockAuth
         };
         return Promise.resolve({ data: { token: 'dev-mock-token', officer } });
       },
+      createOfficer: (officerData) => {
+        const stored = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+        // check unique badgeNumber
+        const users = [...mockUsers, ...stored];
+        if (users.find((u) => u.badgeNumber === officerData.badgeNumber)) {
+          return Promise.reject({ response: { status: 409, data: { message: 'Badge number already exists' } } });
+        }
+        const newOfficer = {
+          badgeNumber: officerData.badgeNumber,
+          name: officerData.name,
+          phone: officerData.phone,
+          district: officerData.district,
+          password: officerData.password,
+          passwordHash: `dev-hash-${Date.now()}`,
+          role: officerData.role || 'officer',
+        };
+        stored.push(newOfficer);
+        localStorage.setItem('mockUsers', JSON.stringify(stored));
+        return Promise.resolve({ data: newOfficer });
+      },
     }
   : {
       login: (badgeNumber, password) => authClient.post('/officer/login', { badgeNumber, password }),
+      createOfficer: (officerData) => authClient.post('/officer', officerData),
     };
 
 let fineService;
