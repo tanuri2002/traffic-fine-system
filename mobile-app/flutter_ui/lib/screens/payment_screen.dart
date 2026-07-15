@@ -152,7 +152,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       final paymentRequest = PaymentRequest(
         fineReferenceNumber: widget.fine.referenceNumber,
-        categoryId: widget.fine.category.code,
+        categoryId: widget.fine.category.id,
         amount: widget.fine.amountLkr,
         cardNumber: _cardNumberController.text.replaceAll(' ', ''),
         expiryDate: _expiryDateController.text,

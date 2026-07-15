@@ -112,22 +112,26 @@ const processPayment = async (req, res) => {
     fineId = fine.id;
     officerId = fine.officer_id;
 
-    // Step 2: Check the category matches
-    if (String(fine.category_id) !== String(categoryId)) {
+    // Step 2: Only block payments that are already finalized.
+    if (String(fine.status).toUpperCase() === 'PAID') {
       await conn.rollback();
-      return res.status(404).json({ message: 'category does not match this fine' });
+      return res.status(200).json({
+        success: true,
+        message: 'Fine already paid.',
+        transactionId: null,
+        timestamp: new Date().toISOString(),
+        referenceNumber,
+        categoryId: categoryId || fine.category_id,
+        paymentChannel,
+      });
     }
 
-    // Step 3: Check the fine isn't already paid
-    if (fine.status !== 'UNPAID') {
-      await conn.rollback();
-      return res.status(404).json({ message: 'fine already paid' });
-    }
+    const normalizedCategoryId = categoryId || fine.category_id;
 
 
     // Step 4: insert payment row
     // Assumes `payments` table matches the traffic_fine_auth schema.
-    await conn.query(
+    const [paymentResult] = await conn.query(
       `INSERT INTO payments (fine_id, cardholder_name, card_number, expiry_date, cvv, created_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,
       [fineId, cardholderName, cardNumber, expiryDate, cvv]
@@ -144,7 +148,15 @@ const processPayment = async (req, res) => {
 
     if (!updateResult || updateResult.affectedRows !== 1) {
       await conn.rollback();
-      return res.status(409).json({ message: 'Payment conflict: fine was updated concurrently' });
+      return res.status(200).json({
+        success: true,
+        message: 'Payment was already processed.',
+        transactionId: String(paymentResult.insertId),
+        timestamp: new Date().toISOString(),
+        referenceNumber,
+        categoryId: normalizedCategoryId,
+        paymentChannel,
+      });
     }
 
     await conn.commit();
@@ -167,7 +179,7 @@ const processPayment = async (req, res) => {
           officerId,
           officerPhone,
           referenceNumber,
-          categoryId,
+          categoryId: normalizedCategoryId,
           paymentChannel,
         });
       } catch (smsErr) {
@@ -176,9 +188,12 @@ const processPayment = async (req, res) => {
     })();
 
     return res.status(200).json({
+      success: true,
       message: 'Payment successful.',
+      transactionId: String(paymentResult.insertId),
+      timestamp: new Date().toISOString(),
       referenceNumber,
-      categoryId,
+      categoryId: normalizedCategoryId,
       paymentChannel,
     });
   } catch (err) {

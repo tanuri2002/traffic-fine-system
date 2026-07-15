@@ -34,8 +34,13 @@ class ApiService {
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'referenceNumber': referenceNumber,
-        'paymentChannel': 'MOBILE',
+             'referenceNumber': referenceNumber,
+             'categoryId': details.categoryId,
+             'paymentChannel': 'MOBILE',
+             'cardholderName': details.cardholderName,
+             'cardNumber': details.cardNumber,
+             'expiryDate': details.expiryDate,
+             'cvv': details.cvv,
       }),
     );
 
