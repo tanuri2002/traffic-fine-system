@@ -195,3 +195,4 @@ const processPayment = async (req, res) => {
 };
 
 module.exports = { getFineDetails, processPayment };
+
