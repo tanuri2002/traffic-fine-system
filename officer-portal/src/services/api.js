@@ -26,28 +26,57 @@ apiClient.interceptors.response.use(
 
 const isMockAuth = process.env.REACT_APP_MOCK_AUTH === 'true';
 
+let mockUsers = null;
+if (isMockAuth) {
+  // lazy-load to avoid import in production bundles
+  // eslint-disable-next-line global-require
+  mockUsers = require('./mockUsers').default;
+}
+
 export const authService = isMockAuth
   ? {
-      login: (badgeNumber, password) =>
-        // simple mock response matching real API shape
-        Promise.resolve({
-          data: {
-            token: 'dev-mock-token',
-            officer: {
-              id: 'dev-officer',
-              name: 'Dev Officer',
-              badgeNumber: badgeNumber || 'DEV000',
-            },
-          },
-        }),
+      login: (badgeNumber, password) => {
+        const user = mockUsers.find((u) => u.badgeNumber === badgeNumber);
+        if (!user) {
+          return Promise.reject({ response: { status: 401, data: { message: 'Officer not found' } } });
+        }
+        if (user.password !== password) {
+          return Promise.reject({ response: { status: 401, data: { message: 'Invalid credentials' } } });
+        }
+        // return shape similar to backend
+        const officer = {
+          badgeNumber: user.badgeNumber,
+          name: user.name,
+          phone: user.phone,
+          district: user.district,
+          passwordHash: user.passwordHash,
+          role: user.role,
+        };
+        return Promise.resolve({ data: { token: 'dev-mock-token', officer } });
+      },
     }
   : {
-      login: (badgeNumber, password) =>
-        authClient.post('/officer/login', { badgeNumber, password }),
+      login: (badgeNumber, password) => authClient.post('/officer/login', { badgeNumber, password }),
     };
 
-export const fineService = {
-  createFine: (fineData) => apiClient.post('/fines', fineData),
-};
+let fineService;
+if (isMockAuth) {
+  fineService = {
+    createFine: (fineData) => {
+      const stored = JSON.parse(localStorage.getItem('mockFines') || '[]');
+      const id = `mock-${Date.now()}`;
+      const record = { id, ...fineData };
+      stored.push(record);
+      localStorage.setItem('mockFines', JSON.stringify(stored));
+      return Promise.resolve({ data: record });
+    },
+  };
+} else {
+  fineService = {
+    createFine: (fineData) => apiClient.post('/fines', fineData),
+  };
+}
+
+export { fineService };
 
 export default apiClient;

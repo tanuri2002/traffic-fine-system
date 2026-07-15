@@ -5,6 +5,8 @@ import AuthContext from '../../context/AuthContext';
 import { authService } from '../../services/api';
 import { validateBadgeNumber, validatePassword } from '../../utils/validation';
 
+const isMockAuth = process.env.REACT_APP_MOCK_AUTH === 'true';
+
 function LoginForm() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -68,6 +70,28 @@ function LoginForm() {
       <button type="submit" className="btn-primary" disabled={submitting}>
         {submitting ? 'Signing in...' : 'Sign In'}
       </button>
+      {isMockAuth && (
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={async () => {
+            setSubmitting(true);
+            try {
+              const resp = await authService.login('B12345', 'password123');
+              const { token, officer } = resp.data;
+              login(token, officer);
+              toast.success(`Welcome, ${officer.name}`);
+              navigate('/dashboard');
+            } catch (err) {
+              toast.error('Demo sign in failed');
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+        >
+          Sign in as demo
+        </button>
+      )}
     </form>
   );
 }
