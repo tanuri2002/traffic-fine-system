@@ -13,6 +13,7 @@ import 'models/fine_model.dart';
 import 'services/api_service.dart';
 import 'services/config.dart';
 import 'controllers/fine_controller.dart';
+import 'screens/officer_register_screen.dart';
 
 void main() {
   // Use app config to select backend URLs.
@@ -62,6 +63,8 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const RoleGate());
           case '/officer-login':
             return MaterialPageRoute(builder: (_) => const OfficerLoginScreen());
+            case '/officer-register':
+  return MaterialPageRoute(builder: (_) => const OfficerRegisterScreen());
           case '/login':
             return MaterialPageRoute(builder: (_) => const LoginScreen());
           case '/register':

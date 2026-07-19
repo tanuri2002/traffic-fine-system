@@ -135,6 +135,17 @@ class _OfficerLoginScreenState extends State<OfficerLoginScreen> {
                       isLoading: _isLoading,
                       onPressed: _handleLogin,
                     ),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.center,
+                      child: TextButton(
+                        onPressed: () => Navigator.pushNamed(context, '/officer-register'),
+                        child: const Text(
+                          "Don't have an account? Register",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

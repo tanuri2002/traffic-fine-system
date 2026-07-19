@@ -30,6 +30,39 @@ class OfficerAuthService {
       return false;
     }
   }
+  Future<Map<String, dynamic>> register({
+  required String badgeNumber,
+  required String name,
+  required String phone,
+  required String district,
+  required String password,
+}) async {
+  try {
+    final resp = await http.post(
+      Uri.parse('$baseUrl/auth/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'badgeNumber': badgeNumber,
+        'name': name,
+        'phone': phone,
+        'district': district,
+        'password': password,
+      }),
+    );
+
+    if (resp.statusCode == 201 || resp.statusCode == 200) {
+      return {'success': true};
+    }
+
+    final body = jsonDecode(resp.body);
+    return {
+      'success': false,
+      'message': body['message'] ?? 'Registration failed',
+    };
+  } catch (_) {
+    return {'success': false, 'message': 'Could not reach server'};
+  }
+}
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
