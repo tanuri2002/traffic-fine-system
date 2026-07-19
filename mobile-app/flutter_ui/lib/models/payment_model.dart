@@ -1,6 +1,6 @@
 class PaymentRequest {
   final String fineReferenceNumber;
-  final String categoryId;
+  final int categoryId;
   final double amount;
   final String cardNumber;
   final String expiryDate;

@@ -111,7 +111,7 @@ class _AddFineScreenState extends State<AddFineScreen> {
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<FineCategory>(
-                  value: _selectedCategory,
+                  initialValue: _selectedCategory,
                   isExpanded: true,
                   decoration: InputDecoration(
                     filled: true,

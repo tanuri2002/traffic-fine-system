@@ -90,20 +90,20 @@ class PaymentSuccessScreen extends StatelessWidget {
                           label: 'Reference Number',
                           value: fine.referenceNumber,
                         ),
-                        const Divider(height: 24),
-                        _ReceiptRow(
-                          label: 'Driver Name',
-                          value: fine.driverName,
-                        ),
+                        // const Divider(height: 24),
+                        // _ReceiptRow(
+                        //   label: 'Driver Name',
+                        //   value: fine.driverName,
+                        // ),
                         const Divider(height: 24),
                         _ReceiptRow(
                           label: 'Violation Type',
-                          value: fine.violationType,
+                          value: fine.category.title,
                         ),
                         const Divider(height: 24),
                         _ReceiptRow(
                           label: 'Amount Paid',
-                          value: 'Rs. ${fine.amount.toStringAsFixed(2)}',
+                          value: 'Rs. ${fine.amountLkr.toStringAsFixed(2)}',
                           isHighlight: true,
                         ),
                         const Divider(height: 24),
