@@ -104,15 +104,19 @@ async function registerOfficer(req, res, next) {
       return res.status(400).json({ message: "badgeNumber, name, phone, district, and password are required" });
     }
 
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters long" });
+    }
+
     const normalizedBadgeNumber = trimString(badgeNumber);
     const registryOfficer = await Officer.findOfficerRegistryByBadgeNumber(normalizedBadgeNumber);
 
     if (!registryOfficer) {
-      return res.status(403).json({ message: "Officer details are not approved by admin" });
+      return res.status(403).json({ message: "Badge number not recognized. Contact your administrator." });
     }
 
-    if (registryOfficer.name !== trimString(name) || registryOfficer.phone !== trimString(phone) || registryOfficer.district !== trimString(district)) {
-      return res.status(403).json({ message: "Officer details do not match the admin registry" });
+    if (registryOfficer.district.trim().toLowerCase() !== district.trim().toLowerCase()) {
+      return res.status(403).json({ message: "District does not match the registered district for this badge number." });
     }
 
     const existing = await Officer.findOfficerByBadgeNumber(normalizedBadgeNumber);
@@ -134,6 +138,9 @@ async function registerOfficer(req, res, next) {
     return res.status(201).json({
       id: officer.id,
       badgeNumber: officer.badgeNumber,
+      name: officer.name,
+      phone: officer.phone,
+      district: officer.district,
       role: officer.role
     });
   } catch (error) {
@@ -151,7 +158,7 @@ async function loginOfficer(req, res, next) {
 
     const officer = await Officer.findOfficerByBadgeNumber(trimString(badgeNumber));
     if (!officer) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Officer not found" });
     }
 
     const isValid = await bcrypt.compare(password, officer.passwordHash);
@@ -171,6 +178,7 @@ async function loginOfficer(req, res, next) {
         id: officer.id,
         badgeNumber: officer.badgeNumber,
         name: officer.name,
+        phone: officer.phone,
         district: officer.district,
         role: officer.role
       }

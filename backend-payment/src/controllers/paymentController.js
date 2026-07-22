@@ -43,13 +43,15 @@ const getFineDetails = async (req, res) => {
          f.category_id,
          f.officer_id,
          f.driver_license_no,
+         f.driver_name,
          f.vehicle_no,
          f.status,
          f.paid_at,
          f.payment_channel,
          f.created_at,
          f.updated_at,
-         c.name AS category_name,
+         c.title AS category_name,
+         c.amount_lkr AS amount,
          o.name AS officer_name,
          o.phone AS officer_phone
        FROM fines f
@@ -127,7 +129,7 @@ const processPayment = async (req, res) => {
 
     // Step 4: insert payment row
     // Assumes `payments` table matches the traffic_fine_auth schema.
-    await conn.query(
+    const [payResult] = await conn.query(
       `INSERT INTO payments (fine_id, cardholder_name, card_number, expiry_date, cvv, created_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,
       [fineId, cardholderName, cardNumber, expiryDate, cvv]
@@ -180,6 +182,8 @@ const processPayment = async (req, res) => {
       referenceNumber,
       categoryId,
       paymentChannel,
+      transactionId: `TXN-${payResult.insertId}-${Date.now()}`,
+      receiptNumber: `RCPT-${payResult.insertId}`
     });
   } catch (err) {
     try {

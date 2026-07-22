@@ -1,7 +1,5 @@
 const express = require("express");
 const {
-  registerOfficer,
-  loginOfficer,
   createCategory,
   listCategories,
   issueFine,
@@ -20,9 +18,6 @@ const {
 const { authMiddleware, requireRole } = require("./authMiddleware");
 
 const router = express.Router();
-
-router.post("/auth/register", registerOfficer);
-router.post("/auth/login", loginOfficer);
 
 router.get("/categories", listCategories);
 router.post("/categories", authMiddleware, requireRole("admin"), createCategory);
