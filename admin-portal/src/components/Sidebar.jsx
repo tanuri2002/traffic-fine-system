@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaChartBar,
@@ -7,9 +7,12 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
+import { clearToken } from "../services/authService";
+
 function Sidebar() {
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
     {
@@ -33,6 +36,11 @@ function Sidebar() {
       icon: <FaTable />,
     },
   ];
+
+  const handleLogout = () => {
+    clearToken();
+    navigate("/");
+  };
 
   return (
     <div className="w-64 h-screen bg-[#0b111e]/95 text-white fixed shadow-2xl border-r border-white/10 backdrop-blur-xl">
@@ -74,6 +82,8 @@ function Sidebar() {
       <div className="absolute bottom-5 w-full px-4">
 
         <button
+          type="button"
+          onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-300 to-blue-400 hover:from-blue-200 hover:to-blue-300 p-3 rounded-xl shadow-[0_12px_32px_rgba(147,197,253,0.35)]"
         >
           <FaSignOutAlt />

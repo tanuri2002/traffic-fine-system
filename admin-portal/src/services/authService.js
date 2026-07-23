@@ -64,13 +64,12 @@ export const login = async (badgeNumber, password) => {
   }
 };
 
-export const signup = async ({ badgeNumber, name, phone, district, password }) => {
+export const signup = async ({ fullName, officialEmail, badgeNumber, password }) => {
   try {
     const response = await API.post("/auth/signup", {
+      fullName,
+      officialEmail,
       badgeNumber,
-      name,
-      phone,
-      district,
       password,
     });
 

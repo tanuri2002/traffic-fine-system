@@ -2,14 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, signup } from "../services/authService";
 
-import { FaUserShield, FaIdBadge, FaLock, FaPhone, FaMapMarkerAlt, FaUser } from "react-icons/fa";
+import { FaUserShield, FaIdBadge, FaLock, FaUser, FaEnvelope } from "react-icons/fa";
 
 function LoginPage() {
   const [mode, setMode] = useState("login");
+  const [fullName, setFullName] = useState("");
+  const [officialEmail, setOfficialEmail] = useState("");
   const [badgeNumber, setBadgeNumber] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [district, setDistrict] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,10 +41,9 @@ function LoginPage() {
     setErrorMessage("");
 
     const response = await signup({
+      fullName,
+      officialEmail,
       badgeNumber,
-      name,
-      phone,
-      district,
       password,
     });
 
@@ -73,10 +71,9 @@ function LoginPage() {
   };
 
   const resetForm = () => {
+    setFullName("");
+    setOfficialEmail("");
     setBadgeNumber("");
-    setName("");
-    setPhone("");
-    setDistrict("");
     setPassword("");
     setConfirmPassword("");
     setErrorMessage("");
@@ -153,7 +150,7 @@ function LoginPage() {
 
             {mode === "signup" && (
               <div className="mb-5">
-                <label className="text-slate-300 text-sm font-medium">Name</label>
+                <label className="text-slate-300 text-sm font-medium">Full Name</label>
 
                 <div className={fieldShell}>
                   <FaUser className="text-slate-400 text-lg shrink-0" />
@@ -163,22 +160,43 @@ function LoginPage() {
                     placeholder="Enter full name"
                     autoComplete="name"
                     className={inputBase}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {mode === "signup" && (
+              <div className="mb-5">
+                <label className="text-slate-300 text-sm font-medium">Official Email</label>
+
+                <div className={fieldShell}>
+                  <FaEnvelope className="text-slate-400 text-lg shrink-0" />
+
+                  <input
+                    type="email"
+                    placeholder="Enter official email"
+                    autoComplete="email"
+                    className={inputBase}
+                    value={officialEmail}
+                    onChange={(e) => setOfficialEmail(e.target.value)}
                   />
                 </div>
               </div>
             )}
 
             <div className="mb-5">
-              <label className="text-slate-300 text-sm font-medium">Badge Number</label>
+              <label className="text-slate-300 text-sm font-medium">
+                {mode === "login" ? "Badge Number" : "Badge Number"}
+              </label>
 
               <div className={fieldShell}>
                 <FaIdBadge className="text-slate-400 text-lg shrink-0" />
 
                 <input
                   type="text"
-                  placeholder="Enter badge number"
+                  placeholder={mode === "login" ? "Enter badge number" : "Enter badge number"}
                   autoComplete="off"
                   className={inputBase}
                   value={badgeNumber}
@@ -186,44 +204,6 @@ function LoginPage() {
                 />
               </div>
             </div>
-
-            {mode === "signup" && (
-              <div className="mb-5">
-                <label className="text-slate-300 text-sm font-medium">Phone</label>
-
-                <div className={fieldShell}>
-                  <FaPhone className="text-slate-400 text-lg shrink-0" />
-
-                  <input
-                    type="tel"
-                    placeholder="Enter phone number"
-                    autoComplete="tel"
-                    className={inputBase}
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-
-            {mode === "signup" && (
-              <div className="mb-5">
-                <label className="text-slate-300 text-sm font-medium">District</label>
-
-                <div className={fieldShell}>
-                  <FaMapMarkerAlt className="text-slate-400 text-lg shrink-0" />
-
-                  <input
-                    type="text"
-                    placeholder="Enter district"
-                    autoComplete="off"
-                    className={inputBase}
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
 
             <div className="mb-5">
               <label className="text-slate-300 text-sm font-medium">
