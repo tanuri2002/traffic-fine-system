@@ -104,19 +104,19 @@ function LoginPage() {
       ></div>
 
       <div className="relative z-10 group w-[min(92vw,520px)]">
-        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-[36px] blur opacity-35 group-hover:opacity-70 transition duration-1000"></div>
+        <div className="absolute -inset-1 bg-linear-to-r from-cyan-400 to-blue-600 rounded-[36px] blur opacity-35 group-hover:opacity-70 transition duration-1000"></div>
 
         <div className="relative rounded-[36px] overflow-hidden border border-white/10 bg-white/10 backdrop-blur-2xl shadow-[0_25px_80px_rgba(0,0,0,0.65)]">
-          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white/15 to-transparent"></div>
+          <div className="absolute top-0 left-0 w-full h-32 bg-linear-to-b from-white/15 to-transparent"></div>
 
-          <div className="h-1 w-full bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400"></div>
+          <div className="h-1 w-full bg-linear-to-r from-cyan-400 via-blue-500 to-cyan-400"></div>
 
           <form className="px-8 py-10 sm:px-12 sm:py-12" onSubmit={handleSubmit}>
             <div className="flex flex-col items-center mb-8">
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-cyan-400 blur-2xl opacity-40 animate-pulse"></div>
 
-                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex justify-center items-center shadow-[0_0_40px_rgba(59,130,246,0.8)]">
+                <div className="relative w-24 h-24 rounded-full bg-linear-to-br from-cyan-400 to-blue-600 flex justify-center items-center shadow-[0_0_40px_rgba(59,130,246,0.8)]">
                   <FaUserShield className="text-white text-5xl" />
                 </div>
               </div>
@@ -252,11 +252,11 @@ function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="relative overflow-hidden w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-lg shadow-[0_10px_50px_rgba(59,130,246,0.6)] hover:scale-[1.02] transition-all duration-300 disabled:opacity-70 disabled:hover:scale-100"
+              className="relative overflow-hidden w-full py-4 rounded-2xl bg-linear-to-r from-cyan-500 to-blue-600 text-white font-bold text-lg shadow-[0_10px_50px_rgba(59,130,246,0.6)] hover:scale-[1.02] transition-all duration-300 disabled:opacity-70 disabled:hover:scale-100"
             >
               <span className="relative z-10">{loading ? "Please wait..." : mode === "login" ? "Secure Login" : "Create Account"}</span>
 
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000"></div>
             </button>
 
             <button
