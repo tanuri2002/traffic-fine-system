@@ -1,24 +1,12 @@
-require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const app = express();
+const router = express.Router();
 
-app.use(cors());
-app.use(express.json());
+const pool = require('../db');
+const { verifyToken, requireAdmin } = require('../middleware/auth');
 
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
+router.use(verifyToken, requireAdmin);
 
-const officerRoutes = require('./routes/officer');
-app.use('/api/auth', officerRoutes);
-
-const statsRoutes = require('./routes/stats');
-app.use('/api/auth', statsRoutes);
-
-const pool = require('./db');
-const { verifyToken, requireAdmin } = require('./middleware/auth');
-
-app.get('/api/auth/stats/overview', verifyToken, requireAdmin, async (req, res) => {
+router.get('/stats/overview', async (req, res) => {
   try {
     const [[summaryRow]] = await pool.query(`
       SELECT
@@ -82,7 +70,7 @@ app.get('/api/auth/stats/overview', verifyToken, requireAdmin, async (req, res) 
   }
 });
 
-app.get('/api/auth/stats/districts', verifyToken, requireAdmin, async (req, res) => {
+router.get('/stats/districts', async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT
@@ -112,7 +100,7 @@ app.get('/api/auth/stats/districts', verifyToken, requireAdmin, async (req, res)
   }
 });
 
-app.get('/api/auth/stats/categories', verifyToken, requireAdmin, async (req, res) => {
+router.get('/stats/categories', async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT
@@ -149,13 +137,4 @@ app.get('/api/auth/stats/categories', verifyToken, requireAdmin, async (req, res
   }
 });
 
-app.get('/api/auth/me', verifyToken, (req, res) => {
-  res.json({ message: 'Token is valid', user: req.user });
-});
-
-app.listen(process.env.PORT, () =>
-  console.log(`backend-auth running on port ${process.env.PORT}`)
-);
-
-console.log('MARKER: server.js loaded successfully');
-console.log('Auth routes:', authRoutes.stack.map(r => r.route && r.route.path));
+module.exports = router;

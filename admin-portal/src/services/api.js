@@ -6,6 +6,12 @@ const API = axios.create({
   baseURL: API_BASE_URL,
 });
 
+export const fetchDashboardOverview = () => API.get("/auth/stats/overview");
+
+export const fetchDistrictStatistics = () => API.get("/auth/stats/districts");
+
+export const fetchCategoryBreakdown = () => API.get("/auth/stats/categories");
+
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
