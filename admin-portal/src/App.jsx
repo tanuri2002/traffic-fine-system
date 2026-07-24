@@ -4,7 +4,9 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import DistrictStatsPage from "./pages/DistrictStatsPage";
 import CategoryBreakdownPage from "./pages/CategoryBreakdownPage";
+import AdminTablePage from "./pages/AdminTablePage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
@@ -38,6 +40,15 @@ function App() {
             <ProtectedRoute>
               <CategoryBreakdownPage />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin-table"
+          element={
+            <AdminRoute>
+              <AdminTablePage />
+            </AdminRoute>
           }
         />
 
