@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import '../controllers/fine_controller.dart';
+import '../services/officer_auth_service.dart';
 
 /// HomeScreen
 ///
@@ -24,13 +25,35 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _referenceNumberController = TextEditingController();
-  final _categoryIdController = TextEditingController();
+  final _authService = OfficerAuthService();
+  List<Map<String, dynamic>> _categories = [];
+  Map<String, dynamic>? _selectedCategory;
+  bool _isLoadingCategories = true;
 
   @override
   void dispose() {
     _referenceNumberController.dispose();
-    _categoryIdController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final categories = await _authService.getCategories();
+      if (!mounted) return;
+      setState(() {
+        _categories = categories;
+        _isLoadingCategories = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoadingCategories = false);
+    }
   }
 
   Future<void> _checkFine() async {
@@ -41,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final controller = context.read<FineController>();
       await controller.searchFine(
         _referenceNumberController.text,
-        _categoryIdController.text,
+        _selectedCategory!['code'].toString(),
       );
 
       if (!mounted) return;
@@ -68,15 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (value.length < 10) {
       return 'Reference number must be at least 10 characters';
-    }
-    return null;
-  }
-
-  String? _validateCategoryId(String? value) {
-    /// Validator for the category ID field.
-    /// Ensures the field is not empty.
-    if (value == null || value.isEmpty) {
-      return 'Please enter category ID';
     }
     return null;
   }
@@ -177,13 +191,55 @@ class _HomeScreenState extends State<HomeScreen> {
                           validator: _validateReferenceNumber,
                           keyboardType: TextInputType.text,
                         ),
-                        CustomTextField(
-                          label: 'Category ID',
-                          hintText: 'e.g., CAT001',
-                          controller: _categoryIdController,
-                          validator: _validateCategoryId,
-                          keyboardType: TextInputType.text,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Category',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF001F5C),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _isLoadingCategories
+                                ? const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: Center(child: CircularProgressIndicator()),
+                                  )
+                                : DropdownButtonFormField<Map<String, dynamic>>(
+                                    value: _selectedCategory,
+                                    isExpanded: true,
+                                    decoration: InputDecoration(
+                                      hintText: 'Select violation category',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 14,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[100],
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                    ),
+                                    items: _categories
+                                        .map((c) => DropdownMenuItem(
+                                              value: c,
+                                              child: Text('${c['title']} (${c['code']})'),
+                                            ))
+                                        .toList(),
+                                    onChanged: (val) => setState(() => _selectedCategory = val),
+                                    validator: (v) => v == null ? 'Please select a category' : null,
+                                  ),
+                          ],
                         ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -199,7 +255,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   //   ),
                   // ),
 
-
                   // Check Fine Button
                   Consumer<FineController>(
                     builder: (context, controller, _) => CustomButton(
@@ -208,7 +263,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       isLoading: controller.loading,
                     ),
                   ),
-
 
                   const SizedBox(height: 24),
 
