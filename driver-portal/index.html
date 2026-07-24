@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traffic Fine Payment Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="eyebrow">Driver Portal</div>
+      <h1>Pay your traffic fine in one clean flow</h1>
+      <p>
+        Enter your reference number and category ID to load the fine summary, then complete payment securely.
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="panel panel-accent">
+        <div class="panel-header">
+          <h2>Find Fine</h2>
+          <p>Use the same reference number and category ID from the officer-issued fine.</p>
+        </div>
+
+        <form id="lookup-form" class="form-grid">
+          <label>
+            <span>Reference Number</span>
+            <input id="reference-number" name="referenceNumber" type="text" placeholder="REF001" autocomplete="off" required />
+          </label>
+
+          <label>
+            <span>Category ID</span>
+            <input id="category-id" name="categoryId" type="number" min="1" step="1" placeholder="1" required />
+          </label>
+
+          <button class="primary-button" type="submit">Load Fine Summary</button>
+        </form>
+
+        <p id="lookup-message" class="status-copy" aria-live="polite"></p>
+      </section>
+
+      <section class="panel summary-panel" id="summary-panel" hidden>
+        <div class="panel-header">
+          <h2>Fine Summary</h2>
+          <p>Review the fine details before making payment.</p>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row"><span>Reference Number</span><strong id="summary-reference">-</strong></div>
+          <div class="summary-row"><span>Driver Name</span><strong id="summary-driver">-</strong></div>
+          <div class="summary-row"><span>Vehicle Number</span><strong id="summary-vehicle">-</strong></div>
+          <div class="summary-row"><span>Offense</span><strong id="summary-offense">-</strong></div>
+          <div class="summary-row"><span>Fine Amount</span><strong id="summary-amount">-</strong></div>
+          <div class="summary-row"><span>Date</span><strong id="summary-date">-</strong></div>
+          <div class="summary-row"><span>Status</span><strong id="summary-status" class="status-badge">-</strong></div>
+        </div>
+      </section>
+
+      <section class="panel" id="payment-panel" hidden>
+        <div class="panel-header">
+          <h2>Payment Details</h2>
+          <p>Fill in the card details to complete payment.</p>
+        </div>
+
+        <form id="payment-form" class="form-grid payment-form">
+          <label>
+            <span>Cardholder Name</span>
+            <input id="cardholder-name" name="cardholderName" type="text" placeholder="Enter cardholder name" required />
+          </label>
+
+          <label>
+            <span>Card Number</span>
+            <input id="card-number" name="cardNumber" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="Enter card number" required />
+          </label>
+
+          <div class="split-grid">
+            <label>
+              <span>Expiry Date</span>
+              <input id="expiry-date" name="expiryDate" type="text" placeholder="MM/YY" autocomplete="cc-exp" required />
+            </label>
+
+            <label>
+              <span>CVV</span>
+              <input id="cvv" name="cvv" type="password" inputmode="numeric" autocomplete="cc-csc" placeholder="CVV" required />
+            </label>
+          </div>
+
+          <button class="primary-button" type="submit">Submit Payment</button>
+        </form>
+
+        <p id="payment-message" class="status-copy" aria-live="polite"></p>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+.create-fine-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.create-fine-card {
+  width: 100%;
+  max-width: 720px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.6rem 1.6rem 2rem;
+  box-shadow: 0 12px 30px rgba(8, 20, 40, 0.06);
+  border: 1px solid rgba(16, 40, 64, 0.06);
+}
+
+.create-fine-card h1 {
+  margin: 0 0 1rem 0;
+  font-size: 1.8rem;
+  color: #0f2940;
+}
+
+.create-fine-card .reference-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.create-fine-card .form-group label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  color: #0f2940;
+}
+
+.create-fine-card .form-group input,
+.create-fine-card .form-group select,
+.create-fine-card .form-group textarea {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 40, 64, 0.08);
+  font-size: 1rem;
+  color: #0f2940;
+}
+
+.create-fine-card .form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.create-fine-card .btn-primary {
+  background: linear-gradient(90deg,#2678ea,#1a5cc2);
+  color: #fff;
+  border: none;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 1 1 auto;
+}
+
+.create-fine-card .btn-secondary {
+  background: #f0f4f8;
+  border: 1px solid rgba(16,40,64,0.06);
+  color: #0f2940;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+/* ensure footer stays at bottom when content is short */
+.footer { position: relative; }

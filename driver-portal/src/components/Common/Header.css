@@ -1,26 +1,23 @@
 .header {
-  background: rgba(4, 30, 78, 0.82);
-  color: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 8px 24px rgba(3, 14, 36, 0.24);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.home-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: rgba(4, 30, 78, 0.82);
+  box-shadow: 0 8px 24px rgba(3, 14, 36, 0.24);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
 }
 
-.home-brand {
+.header .home-brand {
   display: flex;
   align-items: center;
   gap: 0.8rem;
 }
 
-.home-brand-logo {
+.header .home-brand-logo {
   display: block;
   width: 2.9rem;
   height: 2.9rem;
@@ -31,52 +28,74 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
 }
 
-.home-brand-text h1 {
+.header .home-brand-text h1 {
   margin: 0;
   font-size: 1.15rem;
   line-height: 1.1;
+  color: #ffffff;
 }
 
-.home-brand-text p {
+.header .home-brand-text p {
   margin: 0.2rem 0 0;
   font-size: 0.82rem;
   opacity: 0.85;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.home-nav-links {
+.header .home-nav-links {
   display: flex;
   align-items: center;
   gap: 1.4rem;
   flex-wrap: wrap;
 }
 
-.home-nav-links a {
-  text-decoration: none;
+.header .home-nav-links a {
   color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
   font-weight: 500;
   font-size: 0.92rem;
   padding-bottom: 0.4rem;
   border-bottom: 2px solid transparent;
-  transition: color 0.3s, border-bottom-color 0.3s;
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
-.home-nav-links a:hover,
-.home-nav-links a.active {
+.header .home-nav-links a.active,
+.header .home-nav-links a:hover {
   color: #ffffff;
   border-bottom-color: #ffffff;
+}
+
+.header .btn-logout {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.header .btn-logout:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.header .officer-info {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.92rem;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
   .header {
     padding: 1rem;
-  }
-
-  .home-nav {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .home-nav-links {
-    gap: 1rem;
+  .header .home-nav-links {
+    margin-top: 0.5rem;
   }
 }
+
