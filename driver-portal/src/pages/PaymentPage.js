@@ -30,9 +30,13 @@ function PaymentPage() {
     setLoading(true);
     try {
       const response = await paymentService.processPayment({
-        ...paymentData,
         referenceNumber: fineDetails?.referenceNumber,
-        amount: fineDetails?.amount,
+        categoryId: fineDetails?.categoryId,
+        paymentChannel: 'WEB',
+        cardholderName: paymentData.cardName,
+        cardNumber: paymentData.cardNumber,
+        expiryDate: paymentData.expiryDate,
+        cvv: paymentData.cvv,
       });
 
       const responseData = response?.data || {};

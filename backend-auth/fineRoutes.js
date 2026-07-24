@@ -1,0 +1,42 @@
+const express = require("express");
+const {
+  createCategory,
+  listCategories,
+  issueFine,
+  lookupFine,
+  listMyFines,
+  markFineAsPaid,
+  completeFinePayment,
+  getDistrictCollections,
+  getCategoryCollections,
+  listOfficerRegistry,
+  getOfficerRegistryEntry,
+  createOfficerRegistryEntry,
+  updateOfficerRegistryEntry,
+  deleteOfficerRegistryEntry
+} = require("./fineController");
+const { authMiddleware, requireRole } = require("./authMiddleware");
+
+const router = express.Router();
+
+router.get("/categories", listCategories);
+router.post("/categories", authMiddleware, requireRole("admin"), createCategory);
+
+router.get("/fines/lookup", lookupFine);
+router.post("/fines", authMiddleware, requireRole("officer", "admin"), issueFine);
+router.get("/fines/my", authMiddleware, requireRole("officer", "admin"), listMyFines);
+router.post("/payments/complete", completeFinePayment);
+router.patch("/fines/:referenceNumber/pay", authMiddleware, requireRole("admin"), markFineAsPaid);
+
+router.get("/admin/collections/districts", authMiddleware, requireRole("admin"), getDistrictCollections);
+router.get("/admin/collections/categories", authMiddleware, requireRole("admin"), getCategoryCollections);
+
+// Admin Officer Registry CRUD Routes
+router.get("/admin/officer-registry", authMiddleware, requireRole("admin"), listOfficerRegistry);
+router.get("/admin/officer-registry/:id", authMiddleware, requireRole("admin"), getOfficerRegistryEntry);
+router.post("/admin/officer-registry", authMiddleware, requireRole("admin"), createOfficerRegistryEntry);
+router.put("/admin/officer-registry/:id", authMiddleware, requireRole("admin"), updateOfficerRegistryEntry);
+router.delete("/admin/officer-registry/:id", authMiddleware, requireRole("admin"), deleteOfficerRegistryEntry);
+
+module.exports = router;
+

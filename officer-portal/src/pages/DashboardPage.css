@@ -1,0 +1,120 @@
+.dashboard-page {
+  padding: 2.5rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(8, 20, 40, 0.05);
+  border: 1px solid rgba(16, 40, 64, 0.06);
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(16, 40, 64, 0.08);
+}
+
+.dashboard-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: #0f2940;
+}
+
+.officer-details {
+  margin: 0;
+  color: #5a6e80;
+  font-size: 1.05rem;
+}
+
+.fines-section {
+  margin-top: 2rem;
+}
+
+.fines-section h2 {
+  font-size: 1.4rem;
+  color: #0f2940;
+  margin: 0 0 1rem 0;
+}
+
+.fines-table-wrapper {
+  overflow-x: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 40, 64, 0.08);
+}
+
+.fines-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.fines-table th,
+.fines-table td {
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+.fines-table th {
+  background-color: #f7fafc;
+  color: #4a5568;
+  font-weight: 600;
+  border-bottom: 2px solid rgba(16, 40, 64, 0.08);
+}
+
+.fines-table td {
+  border-bottom: 1px solid rgba(16, 40, 64, 0.06);
+  color: #2d3748;
+}
+
+.fines-table tr:last-child td {
+  border-bottom: none;
+}
+
+.fines-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.unpaid {
+  background-color: #feebc8;
+  color: #c05621;
+}
+
+.status-badge.paid {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #718096;
+}
+
+.empty-state p {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.loading-spinner,
+.error-message {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  color: #e53e3e;
+}

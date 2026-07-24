@@ -1,0 +1,121 @@
+import axios from 'axios';
+
+const AUTH_API_URL = process.env.REACT_APP_AUTH_API_URL || 'http://localhost:5000/auth';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+
+const authClient = axios.create({ baseURL: AUTH_API_URL, timeout: 10000 });
+const apiClient = axios.create({ baseURL: API_BASE_URL, timeout: 10000 });
+
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('officerToken');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('officerToken');
+      localStorage.removeItem('officerData');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+const isMockAuth = process.env.REACT_APP_MOCK_AUTH === 'true';
+
+let mockUsers = null;
+if (isMockAuth) {
+  // lazy-load to avoid import in production bundles
+  // eslint-disable-next-line global-require
+  mockUsers = require('./mockUsers').default;
+}
+
+export const authService = isMockAuth
+  ? {
+      login: (badgeNumber, password) => {
+        // include any created mock users stored in localStorage
+        const stored = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+        const users = [...mockUsers, ...stored];
+        const user = users.find((u) => u.badgeNumber === badgeNumber);
+        if (!user) {
+          return Promise.reject({ response: { status: 401, data: { message: 'Officer not found' } } });
+        }
+        if (user.password !== password) {
+          return Promise.reject({ response: { status: 401, data: { message: 'Invalid credentials' } } });
+        }
+        // return shape similar to backend
+        const officer = {
+          badgeNumber: user.badgeNumber,
+          name: user.name,
+          phone: user.phone,
+          district: user.district,
+          passwordHash: user.passwordHash,
+          role: user.role,
+        };
+        return Promise.resolve({ data: { token: 'dev-mock-token', officer } });
+      },
+      createOfficer: (officerData) => {
+        const stored = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+        // check unique badgeNumber
+        const users = [...mockUsers, ...stored];
+        if (users.find((u) => u.badgeNumber === officerData.badgeNumber)) {
+          return Promise.reject({ response: { status: 409, data: { message: 'Badge number already exists' } } });
+        }
+        const newOfficer = {
+          badgeNumber: officerData.badgeNumber,
+          name: officerData.name,
+          phone: officerData.phone,
+          district: officerData.district,
+          password: officerData.password,
+          passwordHash: `dev-hash-${Date.now()}`,
+          role: officerData.role || 'officer',
+        };
+        stored.push(newOfficer);
+        localStorage.setItem('mockUsers', JSON.stringify(stored));
+        return Promise.resolve({ data: newOfficer });
+      },
+    }
+  : {
+      login: (badgeNumber, password) => authClient.post('/officer/login', { badgeNumber, password }),
+      createOfficer: (officerData) => authClient.post('/officer', officerData),
+    };
+
+let fineService;
+if (isMockAuth) {
+  fineService = {
+    createFine: (fineData) => {
+      const stored = JSON.parse(localStorage.getItem('mockFines') || '[]');
+      const id = `mock-${Date.now()}`;
+      const record = { id, ...fineData };
+      stored.push(record);
+      localStorage.setItem('mockFines', JSON.stringify(stored));
+      return Promise.resolve({ data: record });
+    },
+    getCategories: () => {
+      return Promise.resolve({
+        data: [
+          { id: 1, code: 'SPEEDING', title: 'Speed Limit Exceeded' },
+          { id: 2, code: 'PARKING', title: 'Parking Violation' },
+          { id: 3, code: 'RED_LIGHT', title: 'Running a Red Light' },
+        ],
+      });
+    },
+    getMyFines: () => {
+      const stored = JSON.parse(localStorage.getItem('mockFines') || '[]');
+      return Promise.resolve({ data: stored });
+    },
+  };
+} else {
+  fineService = {
+    createFine: (fineData) => apiClient.post('/fines', fineData),
+    getCategories: () => apiClient.get('/categories'),
+    getMyFines: () => apiClient.get('/fines/my'),
+  };
+}
+
+export { fineService };
+
+export default apiClient;

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ReferenceForm.css';
 import AppContext from '../../context/AppContext';
@@ -10,7 +10,20 @@ function ReferenceForm() {
   const { setFineData, setLoading, setError } = useContext(AppContext);
   const [formData, setFormData] = useState({ referenceNumber: '', categoryId: '' });
   const [validationErrors, setValidationErrors] = useState({});
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const resp = await fineService.getCategories(); // adjust to your actual API method
+        setCategories(resp?.data || []);
+      } catch (err) {
+        toast.error('Failed to load categories');
+      }
+    };
+    loadCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,26 +44,38 @@ function ReferenceForm() {
     setLoading(true);
     setError(null);
     try {
-      // Try to fetch real data; if backend not available this may fail.
       const resp = await fineService.getFineDetails(formData.referenceNumber, formData.categoryId);
       if (resp?.data) {
-        setFineData(resp.data);
-        sessionStorage.setItem('fineData', JSON.stringify(resp.data));
+        const raw = resp.data;
+        const mapped = {
+          id: raw.id,
+          referenceNumber: raw.reference_number || raw.referenceNumber,
+          categoryId: raw.category_id || raw.categoryId,
+          officerId: raw.officer_id || raw.officerId,
+          driverLicenseNo: raw.driver_license_no || raw.driverLicenseNo,
+          driverName: raw.driver_name || raw.driverName,
+          vehicleNumber: raw.vehicle_no || raw.vehicleNumber,
+          status: raw.status,
+          paidAt: raw.paid_at || raw.paidAt,
+          paymentChannel: raw.payment_channel || raw.paymentChannel,
+          createdAt: raw.created_at || raw.createdAt,
+          date: raw.created_at ? new Date(raw.created_at).toLocaleDateString() : '',
+          offense: raw.category_name || raw.offense,
+          amount: raw.amount,
+          officerName: raw.officer_name,
+          officerPhone: raw.officer_phone
+        };
+        setFineData(mapped);
+        sessionStorage.setItem('fineData', JSON.stringify(mapped));
         toast.success('Fine details loaded');
-        navigate('/details', { state: { fineDetails: resp.data } });
-      } else if (resp?.error) {
-        setError(resp.error);
-        toast.error(resp.error);
+        navigate('/payment', { state: { fineDetails: mapped } });
       } else {
-        // fallback: set minimal data so user can continue
-        const fallback = { referenceNumber: formData.referenceNumber, status: 'unpaid', amount: 0 };
-        setFineData(fallback);
-        sessionStorage.setItem('fineData', JSON.stringify(fallback));
-        toast.info('Using fallback fine data');
-        navigate('/details', { state: { fineDetails: fallback } });
+        const errorMsg = resp?.error || 'Fine not found';
+        setError(errorMsg);
+        toast.error(errorMsg);
       }
     } catch (err) {
-      const msg = err.message || 'Failed to fetch fine details';
+      const msg = err.response?.data?.message || err.message || 'Failed to fetch fine details';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -77,16 +102,19 @@ function ReferenceForm() {
       </div>
 
       <div className="form-group">
-        <label htmlFor="categoryId">Category ID</label>
-        <input
-          type="text"
+        <label htmlFor="categoryId">Category</label>
+        <select
           id="categoryId"
           name="categoryId"
           value={formData.categoryId}
           onChange={handleChange}
-          placeholder="Enter category ID"
           aria-invalid={!!validationErrors.categoryId}
-        />
+        >
+          <option value="" disabled>Select a category</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id}>{cat.code}</option>
+          ))}
+        </select>
         {validationErrors.categoryId && (
           <div className="input-error" role="alert">{validationErrors.categoryId}</div>
         )}
