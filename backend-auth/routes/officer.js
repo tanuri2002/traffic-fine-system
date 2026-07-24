@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');
+const { getPool } = require('../db');
+const pool = getPool();
 
 router.get('/officer', async (req, res) => {
   const [rows] = await pool.query('SELECT * FROM officer_registry ORDER BY id DESC');

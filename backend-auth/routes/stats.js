@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const pool = require('../db');
+const { getPool } = require('../db');
+const pool = getPool();
 const { verifyToken, requireAdmin } = require('../middleware/auth');
 
 router.use(verifyToken, requireAdmin);
