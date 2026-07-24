@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OfficerAuthService {
   // TODO: replace with the real backend base URL once backend-auth exists
-  static const String baseUrl = 'http://10.0.2.2:5001/api';
+  static const String baseUrl = 'http://localhost:5001/api';
   static const String _tokenKey = 'officer_jwt_token';
 
   Future<bool> login(String officerId, String password) async {
@@ -63,7 +63,14 @@ class OfficerAuthService {
     return {'success': false, 'message': 'Could not reach server'};
   }
 }
-
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final resp = await http.get(Uri.parse('$baseUrl/categories'));
+    if (resp.statusCode == 200) {
+    final List data = jsonDecode(resp.body);
+    return data.cast<Map<String, dynamic>>();
+  }
+  throw Exception('Failed to load categories');
+}
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);

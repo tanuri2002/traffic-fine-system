@@ -13,6 +13,7 @@ class OfficerRegisterScreen extends StatefulWidget {
 class _OfficerRegisterScreenState extends State<OfficerRegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _badgeNumberController = TextEditingController();
+  final _roleController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _districtController = TextEditingController();
@@ -118,6 +119,13 @@ class _OfficerRegisterScreenState extends State<OfficerRegisterScreen> {
                       hintText: 'e.g., OFC-1024',
                       controller: _badgeNumberController,
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your badge number' : null,
+                    ),
+                    
+                    CustomTextField(
+                      label: 'Role',
+                      hintText: 'e.g., Officer',
+                      controller: _roleController,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your role' : null,
                     ),
 
                     CustomTextField(

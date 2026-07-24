@@ -130,10 +130,20 @@ async function initDb() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    await connection.query(`
-      ALTER TABLE fines
-      ADD COLUMN IF NOT EXISTS driver_name VARCHAR(150) NOT NULL DEFAULT 'UNKNOWN'
-    `);
+    const [driverNameColumn] = await connection.query(
+  `SELECT COUNT(*) AS count
+   FROM INFORMATION_SCHEMA.COLUMNS
+   WHERE TABLE_SCHEMA = DATABASE()
+     AND TABLE_NAME = 'fines'
+     AND COLUMN_NAME = 'driver_name'`
+);
+
+if (driverNameColumn[0].count === 0) {
+  await connection.query(`
+    ALTER TABLE fines
+    ADD COLUMN driver_name VARCHAR(150) NOT NULL DEFAULT 'UNKNOWN'
+  `);
+}
   } finally {
     connection.release();
   }
