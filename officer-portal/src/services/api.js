@@ -94,10 +94,25 @@ if (isMockAuth) {
       localStorage.setItem('mockFines', JSON.stringify(stored));
       return Promise.resolve({ data: record });
     },
+    getCategories: () => {
+      return Promise.resolve({
+        data: [
+          { id: 1, code: 'SPEEDING', title: 'Speed Limit Exceeded' },
+          { id: 2, code: 'PARKING', title: 'Parking Violation' },
+          { id: 3, code: 'RED_LIGHT', title: 'Running a Red Light' },
+        ],
+      });
+    },
+    getMyFines: () => {
+      const stored = JSON.parse(localStorage.getItem('mockFines') || '[]');
+      return Promise.resolve({ data: stored });
+    },
   };
 } else {
   fineService = {
     createFine: (fineData) => apiClient.post('/fines', fineData),
+    getCategories: () => apiClient.get('/categories'),
+    getMyFines: () => apiClient.get('/fines/my'),
   };
 }
 
