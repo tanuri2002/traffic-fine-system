@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { fineService } from '../../services/api';
-import { validateVehicleRefId } from '../../utils/validation';
 
 function CreateFineForm({ onCreated }) {
   const [formData, setFormData] = useState({
