@@ -1,12 +1,26 @@
 const { verifyToken } = require("./jwtUtil");
 
-function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing or invalid authorization header" });
+function extractBearerToken(authHeader) {
+  if (typeof authHeader !== "string") {
+    return null;
   }
 
-  const token = authHeader.split(" ")[1];
+  const [scheme, token, ...extraParts] = authHeader.trim().split(/\s+/);
+
+  if (scheme !== "Bearer" || !token || extraParts.length > 0) {
+    return null;
+  }
+
+  return token;
+}
+
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = extractBearerToken(authHeader);
+
+  if (!token) {
+    return res.status(401).json({ message: "Missing or invalid authorization header" });
+  }
 
   try {
     const decoded = verifyToken(token);

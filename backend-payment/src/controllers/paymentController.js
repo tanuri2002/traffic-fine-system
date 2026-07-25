@@ -43,13 +43,15 @@ const getFineDetails = async (req, res) => {
          f.category_id,
          f.officer_id,
          f.driver_license_no,
+         f.driver_name,
          f.vehicle_no,
          f.status,
          f.paid_at,
          f.payment_channel,
          f.created_at,
          f.updated_at,
-         c.name AS category_name,
+         c.title AS category_name,
+         c.amount_lkr AS amount,
          o.name AS officer_name,
          o.phone AS officer_phone
        FROM fines f
@@ -112,26 +114,22 @@ const processPayment = async (req, res) => {
     fineId = fine.id;
     officerId = fine.officer_id;
 
-    // Step 2: Only block payments that are already finalized.
-    if (String(fine.status).toUpperCase() === 'PAID') {
+    // Step 2: Check the category matches
+    if (String(fine.category_id) !== String(categoryId)) {
       await conn.rollback();
-      return res.status(200).json({
-        success: true,
-        message: 'Fine already paid.',
-        transactionId: null,
-        timestamp: new Date().toISOString(),
-        referenceNumber,
-        categoryId: categoryId || fine.category_id,
-        paymentChannel,
-      });
+      return res.status(404).json({ message: 'category does not match this fine' });
     }
 
-    const normalizedCategoryId = categoryId || fine.category_id;
+    // Step 3: Check the fine isn't already paid
+    if (fine.status !== 'UNPAID') {
+      await conn.rollback();
+      return res.status(404).json({ message: 'fine already paid' });
+    }
 
 
     // Step 4: insert payment row
     // Assumes `payments` table matches the traffic_fine_auth schema.
-    const [paymentResult] = await conn.query(
+    const [payResult] = await conn.query(
       `INSERT INTO payments (fine_id, cardholder_name, card_number, expiry_date, cvv, created_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,
       [fineId, cardholderName, cardNumber, expiryDate, cvv]
@@ -148,15 +146,7 @@ const processPayment = async (req, res) => {
 
     if (!updateResult || updateResult.affectedRows !== 1) {
       await conn.rollback();
-      return res.status(200).json({
-        success: true,
-        message: 'Payment was already processed.',
-        transactionId: String(paymentResult.insertId),
-        timestamp: new Date().toISOString(),
-        referenceNumber,
-        categoryId: normalizedCategoryId,
-        paymentChannel,
-      });
+      return res.status(409).json({ message: 'Payment conflict: fine was updated concurrently' });
     }
 
     await conn.commit();
@@ -179,7 +169,7 @@ const processPayment = async (req, res) => {
           officerId,
           officerPhone,
           referenceNumber,
-          categoryId: normalizedCategoryId,
+          categoryId,
           paymentChannel,
         });
       } catch (smsErr) {
@@ -188,13 +178,12 @@ const processPayment = async (req, res) => {
     })();
 
     return res.status(200).json({
-      success: true,
       message: 'Payment successful.',
-      transactionId: String(paymentResult.insertId),
-      timestamp: new Date().toISOString(),
       referenceNumber,
-      categoryId: normalizedCategoryId,
+      categoryId,
       paymentChannel,
+      transactionId: `TXN-${payResult.insertId}-${Date.now()}`,
+      receiptNumber: `RCPT-${payResult.insertId}`
     });
   } catch (err) {
     try {

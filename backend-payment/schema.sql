@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS `fines` (
   `category_id` INT NOT NULL,
   `officer_id` INT NOT NULL,
   `driver_license_no` VARCHAR(50) NOT NULL,
-  `driver_name` VARCHAR(150) NOT NULL DEFAULT 'UNKNOWN',
   `vehicle_no` VARCHAR(20) NOT NULL,
   `status` VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
   `paid_at` DATETIME DEFAULT NULL,

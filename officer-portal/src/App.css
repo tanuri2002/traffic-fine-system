@@ -1,0 +1,70 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  text-align: left;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Use the same hero background behind main content so there are no gaps
+   when page sections are shorter than the viewport. Footer overrides its own background. */
+.main-content {
+  background-image: linear-gradient(180deg, rgba(6, 27, 66, 0.72), rgba(7, 18, 41, 0.46)), url('./images/driver_web_background.png');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Global form edge fixes: consistent box-sizing and clipped card overflow */
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }
+
+input, textarea, select, button {
+  box-sizing: border-box;
+  box-shadow: none !important;
+}
+
+/* Ensure common card wrappers clip children (prevent inputs from overflowing rounded corners) */
+.card, .form-card, .form-wrapper, .form-container,
+.create-officer-card, .create-fine-card, .login-card {
+  overflow: hidden;
+  border-radius: 12px;
+}

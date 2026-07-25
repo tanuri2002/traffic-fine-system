@@ -1,6 +1,14 @@
 const bcrypt = require("bcryptjs");
 const Officer = require("./Officer");
 
+function trimString(value) {
+  return String(value || "").trim();
+}
+
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 function hasAdminSeedConfig() {
   return Boolean(
     process.env.SEED_ADMIN_BADGE_NUMBER ||
@@ -28,20 +36,29 @@ async function seedInitialAdmin() {
     throw new Error("All SEED_ADMIN_* variables must be set together");
   }
 
-  const badgeNumber = SEED_ADMIN_BADGE_NUMBER.trim();
+  const badgeNumber = trimString(SEED_ADMIN_BADGE_NUMBER);
+  const name = trimString(SEED_ADMIN_NAME);
+  const phone = trimString(SEED_ADMIN_PHONE);
+  const district = trimString(SEED_ADMIN_DISTRICT);
+  const password = trimString(SEED_ADMIN_PASSWORD);
+
+  if (!isNonEmptyString(badgeNumber) || !isNonEmptyString(name) || !isNonEmptyString(phone) || !isNonEmptyString(district) || !isNonEmptyString(password)) {
+    throw new Error("SEED_ADMIN_* variables must not be blank");
+  }
+
   const existing = await Officer.findOfficerByBadgeNumber(badgeNumber);
 
   if (existing) {
     return;
   }
 
-  const passwordHash = await bcrypt.hash(SEED_ADMIN_PASSWORD, 10);
+  const passwordHash = await bcrypt.hash(password, 10);
 
   await Officer.createOfficer({
     badgeNumber,
-    name: SEED_ADMIN_NAME.trim(),
-    phone: SEED_ADMIN_PHONE.trim(),
-    district: SEED_ADMIN_DISTRICT.trim(),
+    name,
+    phone,
+    district,
     passwordHash,
     role: "admin"
   });

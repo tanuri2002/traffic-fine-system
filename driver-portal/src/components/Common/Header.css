@@ -1,0 +1,101 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: rgba(4, 30, 78, 0.82);
+  box-shadow: 0 8px 24px rgba(3, 14, 36, 0.24);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+}
+
+.header .home-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.header .home-brand-logo {
+  display: block;
+  width: 2.9rem;
+  height: 2.9rem;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.12rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+
+.header .home-brand-text h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.header .home-brand-text p {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.85;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.header .home-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+
+.header .home-nav-links a {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.header .home-nav-links a.active,
+.header .home-nav-links a:hover {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+.header .btn-logout {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.header .btn-logout:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.header .officer-info {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header .home-nav-links {
+    margin-top: 0.5rem;
+  }
+}
+
