@@ -8,6 +8,7 @@ MySQL-backed REST API for the traffic fine system. This service handles JWT auth
 - Creates the required tables automatically on startup.
 - Issues JWT tokens for authenticated requests.
 - Lets officers register and log in.
+- Verifies officer registration against the admin-maintained officer registry.
 - Lets admins create fine categories and mark fines as paid.
 
 ## From-zero setup
@@ -43,21 +44,62 @@ Optional admin bootstrap variables:
 - `SEED_ADMIN_DISTRICT`
 - `SEED_ADMIN_PASSWORD`
 
+Admin officer registry:
+
+- The `officer_registry` table is the admin-approved source of truth for officer identity.
+- An officer can register only if the submitted badge number, name, phone, and district match an active registry record.
+
+## Team shared database setup
+
+Use a single central MySQL server for the team instead of `localhost` on one developer machine.
+
+1. Provision a shared MySQL instance (cloud VM, managed DB, or office server).
+2. Allow network access only from trusted team IPs.
+3. Create the database and a dedicated team user (do not use `root`):
+
+```sql
+CREATE DATABASE IF NOT EXISTS traffic_fine_auth;
+CREATE USER 'team_dev'@'%' IDENTIFIED BY 'strong_password_here';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, ALTER
+ON traffic_fine_auth.* TO 'team_dev'@'%';
+FLUSH PRIVILEGES;
+```
+
+4. Import [schema.sql](schema.sql) once on the shared server.
+5. Each teammate creates a local `.env` from `.env.example` and points it to the shared DB host:
+
+```env
+DB_HOST=shared-mysql-host-or-ip
+DB_PORT=3306
+DB_USER=team_dev
+DB_PASSWORD=strong_password_here
+DB_NAME=traffic_fine_auth
+```
+
+6. Start the service normally with `npm run dev`.
+
+Security notes:
+
+- Never commit `.env` to git.
+- Rotate credentials immediately if they are exposed.
+- Use different DB users/passwords for development and production.
+- Prefer SSL-enabled MySQL connections when available.
+
 ## Database schema
 
 The schema is defined in [schema.sql](schema.sql). The app will also initialize the same tables automatically when it starts.
 
 ## Main endpoints
 
-- `POST /api/auth/register` - register an officer
-- `POST /api/auth/login` - log in and receive a JWT
+- `POST /auth/officer` - register an officer
+- `POST /auth/officer/login` - log in and receive a JWT
+- Backward-compatible aliases: `POST /auth/register`, `POST /auth/login`, `POST /api/auth/register`, `POST /api/auth/login`
 - `GET /api/categories` - list all categories
 - `POST /api/categories` - create a category, admin only
-- `GET /api/fines/lookup?referenceNumber=...` - look up a fine for online payment
-	- `categoryId` and `categoryCode` are accepted as optional hints, but the fine is resolved by reference number.
+- `GET /api/fines/lookup?referenceNumber=...&categoryId=...` - look up a fine for online payment
+	- Backward compatible: `categoryCode` is also supported.
+- The lookup response includes the receipt fields needed by the user screen: `referenceNumber`, `driverName`, `vehicleNo`, `offense`, `fineAmount`, `date`, `status`, `paidAt`, and `paymentChannel`.
 - `POST /api/fines` - issue a fine, officer/admin only
-	- Accepts `categoryCode` or `categoryId`; if `referenceNumber` is omitted, the backend generates one.
-	- `driverLicenseNo` and `driverName` default to `UNKNOWN` when not supplied by the client.
 - `GET /api/fines/my` - list fines issued by the logged-in officer
 - `PATCH /api/fines/:referenceNumber/pay` - mark a fine as paid, admin only
 

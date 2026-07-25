@@ -1,0 +1,78 @@
+.details-display {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.details-display h2 {
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+.details-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  padding: 1rem;
+  border-bottom: 1px solid #ecf0f1;
+  gap: 1rem;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row label {
+  font-weight: 600;
+  color: #7f8c8d;
+}
+
+.detail-row span {
+  color: #2c3e50;
+}
+
+.detail-row .amount {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #e74c3c;
+}
+
+.detail-row .status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.detail-row .status.pending {
+  background-color: #f39c12;
+  color: white;
+}
+
+.detail-row .status.paid {
+  background-color: #27ae60;
+  color: white;
+}
+
+.detail-row .status.unpaid {
+  background-color: #e74c3c;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-row label {
+    font-size: 0.9rem;
+  }
+}

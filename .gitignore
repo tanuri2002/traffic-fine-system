@@ -23,4 +23,5 @@ logs/
 *.log
 npm-debug.log*
 
-node_modules/
+# Explicitly ignore service env files
+backend-auth/.env

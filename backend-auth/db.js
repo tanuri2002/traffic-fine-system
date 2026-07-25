@@ -81,6 +81,21 @@ async function initDb() {
     `);
 
     await connection.query(`
+      CREATE TABLE IF NOT EXISTS officer_registry (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        badge_number VARCHAR(50) NOT NULL,
+        name VARCHAR(150) NOT NULL,
+        phone VARCHAR(30) NOT NULL,
+        district VARCHAR(100) NOT NULL,
+        active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_officer_registry_badge_number (badge_number)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         code VARCHAR(30) NOT NULL,
@@ -130,20 +145,34 @@ async function initDb() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    const [driverNameColumn] = await connection.query(
-  `SELECT COUNT(*) AS count
-   FROM INFORMATION_SCHEMA.COLUMNS
-   WHERE TABLE_SCHEMA = DATABASE()
-     AND TABLE_NAME = 'fines'
-     AND COLUMN_NAME = 'driver_name'`
-);
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS payments (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        fine_id BIGINT UNSIGNED NOT NULL,
+        cardholder_name VARCHAR(150) NOT NULL,
+        card_number VARCHAR(19) NOT NULL,
+        expiry_date VARCHAR(5) NOT NULL,
+        cvv VARCHAR(4) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        CONSTRAINT fk_payments_fine_id FOREIGN KEY (fine_id) REFERENCES fines (id) ON DELETE CASCADE ON UPDATE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
 
-if (driverNameColumn[0].count === 0) {
-  await connection.query(`
-    ALTER TABLE fines
-    ADD COLUMN driver_name VARCHAR(150) NOT NULL DEFAULT 'UNKNOWN'
-  `);
-}
+    const [driverNameColumn] = await connection.query(
+      `SELECT COUNT(*) AS count
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'fines'
+         AND COLUMN_NAME = 'driver_name'`
+    );
+
+    if (driverNameColumn[0].count === 0) {
+      await connection.query(`
+        ALTER TABLE fines
+        ADD COLUMN driver_name VARCHAR(150) NOT NULL DEFAULT 'UNKNOWN'
+      `);
+    }
   } finally {
     connection.release();
   }
