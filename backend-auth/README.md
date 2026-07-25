@@ -91,8 +91,9 @@ The schema is defined in [schema.sql](schema.sql). The app will also initialize 
 
 ## Main endpoints
 
-- `POST /api/auth/register` - register an officer
-- `POST /api/auth/login` - log in and receive a JWT
+- `POST /auth/officer` - register an officer
+- `POST /auth/officer/login` - log in and receive a JWT
+- Backward-compatible aliases: `POST /auth/register`, `POST /auth/login`, `POST /api/auth/register`, `POST /api/auth/login`
 - `GET /api/categories` - list all categories
 - `POST /api/categories` - create a category, admin only
 - `GET /api/fines/lookup?referenceNumber=...&categoryId=...` - look up a fine for online payment

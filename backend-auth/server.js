@@ -27,7 +27,11 @@ const { registerOfficer, loginOfficer } = require("./fineController");
 const authRouter = express.Router();
 authRouter.post("/officer", registerOfficer);
 authRouter.post("/officer/login", loginOfficer);
+// Backward-compatible endpoints used by older clients.
+authRouter.post("/register", registerOfficer);
+authRouter.post("/login", loginOfficer);
 app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", service: "backend-auth" });
