@@ -11,6 +11,13 @@
   color: #ffffff;
 }
 
+.main-content:has(> .home-page) {
+  padding: 0;
+  max-width: none;
+  margin: 0;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .home-page {
     background-attachment: scroll, scroll;
@@ -103,6 +110,10 @@
   gap: 2rem;
   padding: 3.5rem 4rem 2.5rem;
   min-height: calc(100vh - 6rem);
+}
+
+.hero-section.signup-hero {
+  align-items: start;
 }
 
 .hero-copy {
