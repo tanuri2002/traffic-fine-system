@@ -109,14 +109,25 @@ async function registerOfficer(req, res, next) {
     }
 
     const normalizedBadgeNumber = trimString(badgeNumber);
+    const normalizedName = trimString(name);
+    const normalizedPhone = trimString(phone);
+    const normalizedDistrict = trimString(district);
     const registryOfficer = await Officer.findOfficerRegistryByBadgeNumber(normalizedBadgeNumber);
 
     if (!registryOfficer) {
       return res.status(403).json({ message: "Badge number not recognized. Contact your administrator." });
     }
 
-    if (registryOfficer.district.trim().toLowerCase() !== district.trim().toLowerCase()) {
-      return res.status(403).json({ message: "District does not match the registered district for this badge number." });
+    const registryName = trimString(registryOfficer.name);
+    const registryPhone = trimString(registryOfficer.phone);
+    const registryDistrict = trimString(registryOfficer.district);
+
+    if (
+      registryName.toLowerCase() !== normalizedName.toLowerCase() ||
+      registryPhone.toLowerCase() !== normalizedPhone.toLowerCase() ||
+      registryDistrict.toLowerCase() !== normalizedDistrict.toLowerCase()
+    ) {
+      return res.status(403).json({ message: "Officer details do not match the admin-approved registry entry. Contact your administrator." });
     }
 
     const existing = await Officer.findOfficerByBadgeNumber(normalizedBadgeNumber);
