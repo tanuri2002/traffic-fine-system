@@ -81,6 +81,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid badge number or password' });
     }
 
+
     const token = jwt.sign(
       { id: row.id, badgeNumber: row.badge_number, role: 'admin' },
       process.env.JWT_SECRET,

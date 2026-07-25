@@ -1,136 +1,5 @@
-// import { useEffect, useState } from "react";
-
-// import Sidebar from "../components/Sidebar";
-// import Navbar from "../components/Navbar";
-// import StatCard from "../components/StatCard";
-// import RevenueChart from "../components/RevenueChart";
-// import RecentPaymentsTable from "../components/RecentPaymentsTable";
-// import LoadingSpinner from "../components/LoadingSpinner";
-// import { fetchDashboardOverview } from "../services/api";
-
-// function DashboardPage() {
-//   const [summary, setSummary] = useState({
-//     totalRevenue: 0,
-//     paidFines: 0,
-//     pendingCases: 0,
-//   });
-//   const [revenueByDistrict, setRevenueByDistrict] = useState([]);
-//   const [recentPayments, setRecentPayments] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [errorMessage, setErrorMessage] = useState("");
-
-//   useEffect(() => {
-//     let isMounted = true;
-
-//     const loadDashboard = async () => {
-//       try {
-//         setLoading(true);
-//         setErrorMessage("");
-
-//         const response = await fetchDashboardOverview();
-//         const data = response?.data || {};
-
-//         if (isMounted) {
-//           setSummary({
-//             totalRevenue: Number(data.totalRevenue || 0),
-//             paidFines: Number(data.paidFines || 0),
-//             pendingCases: Number(data.pendingCases || 0),
-//           });
-//           setRevenueByDistrict(Array.isArray(data.revenueByDistrict) ? data.revenueByDistrict : []);
-//           setRecentPayments(Array.isArray(data.recentPayments) ? data.recentPayments : []);
-//         }
-//       } catch (error) {
-//         if (isMounted) {
-//           setErrorMessage(
-//             error?.response?.data?.error || error?.response?.data?.message || "Failed to load dashboard overview"
-//           );
-//         }
-//       } finally {
-//         if (isMounted) {
-//           setLoading(false);
-//         }
-//       }
-//     };
-
-//     loadDashboard();
-
-//     return () => {
-//       isMounted = false;
-//     };
-//   }, []);
-
-//   const formatCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString("en-LK")}`;
-
-//   return (
-//     <div className="relative min-h-screen overflow-hidden bg-[#0b1324]">
-//       {/* Animated Background Glow */}
-//       <div className="absolute -top-37.5 -left-37.5 w-105 h-105 bg-cyan-400/30 rounded-full blur-3xl animate-pulse"></div>
-//       <div className="absolute -bottom-37.5 -right-37.5 w-105 h-105 bg-blue-500/25 rounded-full blur-3xl animate-pulse"></div>
-
-//       {/* Grid Overlay */}
-//       <div
-//         className="absolute inset-0 opacity-15"
-//         style={{
-//           backgroundImage:
-//             "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-//           backgroundSize: "40px 40px",
-//         }}
-//       ></div>
-
-//       <div className="relative z-10 flex">
-//         <Sidebar />
-
-//         <div className="ml-64 w-full">
-//           <Navbar />
-
-//           <div className="p-8">
-//             <div className="relative overflow-hidden rounded-[36px] border border-white/10 bg-white/10 backdrop-blur-2xl shadow-[0_25px_80px_rgba(0,0,0,0.65)] p-8">
-//               <div className="absolute top-0 left-0 w-full h-32 bg-linear-to-b from-white/15 to-transparent"></div>
-//               <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-cyan-400 via-blue-500 to-cyan-400"></div>
-
-//               <div className="relative">
-//                 <div className="flex items-end justify-between gap-4 mb-8">
-//                   <div>
-//                     <h1 className="text-3xl font-semibold text-white">
-//                       Dashboard Overview
-//                     </h1>
-//                     <p className="mt-2 text-slate-300">
-//                       Live totals from fines, categories, officers, and payments.
-//                     </p>
-//                   </div>
-//                 </div>
-
-//                 {loading ? (
-//                   <LoadingSpinner />
-//                 ) : errorMessage ? (
-//                   <div className="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-cyan-100">
-//                     {errorMessage}
-//                   </div>
-//                 ) : (
-//                   <>
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-//                       <StatCard title="Total Revenue" value={formatCurrency(summary.totalRevenue)} color="#93c5fd" />
-//                       <StatCard title="Paid Fines" value={summary.paidFines.toLocaleString("en-LK")} color="#93c5fd" />
-//                       <StatCard title="Pending Cases" value={summary.pendingCases.toLocaleString("en-LK")} color="#93c5fd" />
-//                     </div>
-
-//                     <RevenueChart data={revenueByDistrict} />
-//                     <RecentPaymentsTable payments={recentPayments} />
-//                   </>
-//                 )}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default DashboardPage;
-
-
 import { useEffect, useState } from "react";
+import { FaChartLine } from "react-icons/fa";
 
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
@@ -194,20 +63,16 @@ function DashboardPage() {
   const formatCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString("en-LK")}`;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0A1420]">
-      {/* Faint guilloché-style security texture, consistent across admin pages */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(115deg, #C9A227 0px, #C9A227 1px, transparent 1px, transparent 14px)",
-        }}
-      ></div>
+    <div className="relative min-h-screen overflow-hidden bg-[#eef4fb]">
+      {/* Glowing accent blobs, echoing the driver portal hero */}
+      <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 bg-[#2678ea]/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="pointer-events-none absolute -bottom-24 -right-24 w-96 h-96 bg-[#5fb6ff]/20 rounded-full blur-3xl animate-pulse"></div>
 
       <div
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, rgba(201,162,39,0.06), transparent 55%)",
+          backgroundImage:
+            "repeating-linear-gradient(115deg, #2678ea 0px, #2678ea 1px, transparent 1px, transparent 14px)",
         }}
       ></div>
 
@@ -218,20 +83,22 @@ function DashboardPage() {
           <Navbar />
 
           <div className="p-8">
-            <div className="relative overflow-hidden rounded-2xl border border-[#22314A] bg-[#101C30] shadow-[0_30px_70px_rgba(0,0,0,0.55)] p-8">
-              {/* Hairline seal bar */}
-              <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#8A6A17] via-[#C9A227] to-[#8A6A17]"></div>
+            <div className="relative overflow-hidden rounded-2xl border border-[#e5edf6] bg-white shadow-[0_20px_50px_rgba(15,41,64,0.12)] p-8">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#2678ea] via-[#5fb6ff] to-[#2678ea]"></div>
 
               <div className="relative">
-                <div className="flex items-end justify-between gap-4 mb-8">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2678ea] to-[#1a5cc2] text-white text-2xl shadow-[0_12px_26px_rgba(38,120,234,0.32)]">
+                    <FaChartLine />
+                  </div>
                   <div>
-                    <p className="text-[11px] font-semibold tracking-[0.28em] text-[#C9A227] uppercase mb-2">
+                    <p className="inline-flex rounded-full bg-[#2678ea]/10 px-3 py-1 text-[11px] font-semibold tracking-[0.16em] text-[#1a5cc2] uppercase mb-1.5">
                       Command Summary
                     </p>
-                    <h1 className="font-serif text-[28px] text-[#F4F6F9]">
+                    <h1 className="text-[28px] font-extrabold bg-gradient-to-r from-[#12324d] to-[#1a5cc2] bg-clip-text text-transparent leading-tight">
                       Dashboard Overview
                     </h1>
-                    <p className="mt-2 text-[14px] text-[#9FB0C3]">
+                    <p className="mt-1 text-[14px] text-[#5c7188]">
                       Live totals from fines, categories, officers, and payments.
                     </p>
                   </div>
@@ -243,16 +110,16 @@ function DashboardPage() {
                   <div
                     role="alert"
                     aria-live="polite"
-                    className="rounded-lg border border-[#C9A227]/40 bg-[#C9A227]/10 px-4 py-3 text-[13.5px] text-[#EAD48F]"
+                    className="rounded-lg border border-[#f59e0b]/40 bg-[#f59e0b]/10 px-4 py-3 text-[13.5px] text-[#b45309]"
                   >
                     {errorMessage}
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <StatCard title="Total Revenue" value={formatCurrency(summary.totalRevenue)} color="#C9A227" />
-                      <StatCard title="Paid Fines" value={summary.paidFines.toLocaleString("en-LK")} color="#3FA772" />
-                      <StatCard title="Pending Cases" value={summary.pendingCases.toLocaleString("en-LK")} color="#B4543A" />
+                      <StatCard title="Total Revenue" value={formatCurrency(summary.totalRevenue)} color="#2678ea" />
+                      <StatCard title="Paid Fines" value={summary.paidFines.toLocaleString("en-LK")} color="#34c759" />
+                      <StatCard title="Pending Cases" value={summary.pendingCases.toLocaleString("en-LK")} color="#f59e0b" />
                     </div>
 
                     <RevenueChart data={revenueByDistrict} />
@@ -269,3 +136,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
+

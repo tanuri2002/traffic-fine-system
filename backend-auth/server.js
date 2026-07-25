@@ -23,17 +23,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Officer register/login (from incoming)
-const { registerOfficer, loginOfficer } = require("./fineController");
-const authRouter = express.Router();
-authRouter.post("/officer", registerOfficer);
-authRouter.post("/officer/login", loginOfficer);
-// Backward-compatible endpoints used by older clients.
-authRouter.post("/register", registerOfficer);
-authRouter.post("/login", loginOfficer);
-app.use("/auth", authRouter);
-app.use("/api/auth", authRouter);
-
 // Existing route modules (from HEAD)
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
@@ -47,6 +36,17 @@ app.use('/api/auth', statsRoutes);
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", service: "backend-auth" });
 });
+
+// Officer register/login (from incoming)
+const { registerOfficer, loginOfficer } = require("./fineController");
+const authRouter = express.Router();
+authRouter.post("/officer", registerOfficer);
+authRouter.post("/officer/login", loginOfficer);
+// Backward-compatible endpoints used by older clients.
+authRouter.post("/register", registerOfficer);
+authRouter.post("/login", loginOfficer);
+app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 // Payment service proxy
 const PAYMENT_TARGET = process.env.PAYMENT_SERVICE_URL || 'http://localhost:3001';

@@ -42,18 +42,18 @@ function Sidebar() {
   };
 
   return (
-    <div className="w-64 h-screen bg-[#0A1420] text-[#F4F6F9] fixed border-r border-[#22314A]">
-      <div className="p-6 border-b border-[#22314A]">
+    <div className="w-64 h-screen fixed text-white bg-gradient-to-b from-[#0a2a5e] via-[#0b3a7a] to-[#082e6b] shadow-[6px_0_30px_rgba(8,30,72,0.25)]">
+      <div className="p-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="relative w-9 h-9 rounded-full border-2 border-[#C9A227] flex items-center justify-center shrink-0">
-            <span className="text-[#E3CE84] text-sm font-bold">TA</span>
+          <div className="relative w-9 h-9 rounded-full bg-gradient-to-br from-[#2678ea] to-[#5fb6ff] flex items-center justify-center shrink-0 shadow-[0_8px_18px_rgba(38,120,234,0.35)]">
+            <span className="text-white text-sm font-bold">TA</span>
           </div>
 
           <div>
-            <h1 className="font-serif text-[19px] leading-tight text-[#F4F6F9]">
+            <h1 className="text-[19px] font-bold leading-tight text-white">
               Traffic Admin
             </h1>
-            <p className="text-[11.5px] text-[#9FB0C3]">Sri Lanka Police</p>
+            <p className="text-[11.5px] text-[#a9c3ef]">Sri Lanka Police</p>
           </div>
         </div>
       </div>
@@ -66,13 +66,13 @@ function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-[14.5px] font-medium transition-colors duration-200 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-[14.5px] font-medium transition-all duration-200 ${
                 isActive
-                  ? "bg-[#C9A227] text-[#0A1420]"
-                  : "text-[#9FB0C3] hover:bg-[#101C30] hover:text-[#F4F6F9]"
+                  ? "bg-gradient-to-r from-[#2678ea] to-[#1a5cc2] text-white shadow-[0_8px_20px_rgba(38,120,234,0.35)]"
+                  : "text-[#a9c3ef] hover:bg-white/10 hover:text-white"
               }`}
             >
-              <span className={isActive ? "text-[#0A1420]" : "text-[#7C8CA0]"}>{item.icon}</span>
+              <span className={isActive ? "text-white" : "text-[#a9c3ef]"}>{item.icon}</span>
               {item.name}
             </Link>
           );
@@ -83,8 +83,8 @@ function Sidebar() {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 border border-[#B4543A]/50 text-[#D98567]
-                     hover:bg-[#B4543A]/10 hover:border-[#B4543A] p-3 rounded-lg text-[14.5px] font-medium transition-colors duration-200"
+          className="w-full flex items-center justify-center gap-2 border border-[#ef4444]/40 text-[#fca5a5]
+                     hover:bg-[#ef4444]/10 hover:border-[#ef4444] p-3 rounded-lg text-[14.5px] font-medium transition-colors duration-200"
         >
           <FaSignOutAlt />
           Logout
