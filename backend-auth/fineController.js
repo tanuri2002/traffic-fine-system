@@ -16,6 +16,10 @@ function normalizeRef(value) {
     .toUpperCase();
 }
 
+function generateReferenceNumber() {
+  return `REF-${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
+}
+
 function trimString(value) {
   return String(value || "").trim();
 }
@@ -152,7 +156,9 @@ async function registerOfficer(req, res, next) {
       name: officer.name,
       phone: officer.phone,
       district: officer.district,
-      role: officer.role
+      role: officer.role,
+      createdAt: officer.createdAt,
+      updatedAt: officer.updatedAt
     });
   } catch (error) {
     return next(error);
@@ -240,16 +246,30 @@ async function listCategories(req, res, next) {
 
 async function issueFine(req, res, next) {
   try {
-    const { referenceNumber, categoryCode, driverLicenseNo, driverName, vehicleNo } = req.body;
+    const {
+      referenceNumber,
+      categoryCode,
+      categoryId,
+      driverLicenseNo,
+      driverName,
+      vehicleNo
+    } = req.body;
 
-    if (!isNonEmptyString(referenceNumber) || !isNonEmptyString(categoryCode) || !isNonEmptyString(driverLicenseNo) || !isNonEmptyString(driverName) || !isNonEmptyString(vehicleNo)) {
+    const normalizedCategoryCode = normalizeCode(categoryCode || categoryId);
+    const normalizedVehicleNo = normalizeCode(vehicleNo);
+
+    // referenceNumber, driverLicenseNo, driverName are optional so the
+    // mobile app (which only sends category + vehicleNo) keeps working.
+    // Web clients can still send them explicitly for full detail capture.
+    const normalizedReference = normalizeRef(referenceNumber || generateReferenceNumber());
+    const normalizedDriverLicenseNo = normalizeCode(driverLicenseNo || "UNKNOWN");
+    const normalizedDriverName = trimString(driverName) || "UNKNOWN";
+
+    if (!normalizedCategoryCode || !normalizedVehicleNo) {
       return res.status(400).json({
-        message: "referenceNumber, categoryCode, driverLicenseNo, driverName, vehicleNo are required"
+        message: "categoryCode/categoryId and vehicleNo are required"
       });
     }
-
-    const normalizedReference = normalizeRef(referenceNumber);
-    const normalizedCategoryCode = normalizeCode(categoryCode);
 
     const existingFine = await Fine.findFineByReference(normalizedReference);
     if (existingFine) {
@@ -265,9 +285,9 @@ async function issueFine(req, res, next) {
       referenceNumber: normalizedReference,
       categoryId: category.id,
       officerId: req.user.officerId,
-      driverLicenseNo: normalizeCode(driverLicenseNo),
-      driverName: trimString(driverName),
-      vehicleNo: normalizeCode(vehicleNo)
+      driverLicenseNo: normalizedDriverLicenseNo,
+      driverName: normalizedDriverName,
+      vehicleNo: normalizedVehicleNo
     });
 
     const fineWithDetails = await Fine.findFineByReferenceWithDetails(fine.referenceNumber);
@@ -302,7 +322,11 @@ async function lookupFine(req, res, next) {
     return res.status(200).json({
       ...formatFinePaymentResponse(fine),
       amountLkr: fine.category.amountLkr,
-      issuedAt: fine.createdAt
+      officer: fine.officer,
+      issuedAt: fine.createdAt,
+      paidAt: fine.paidAt,
+      requestedCategoryCode: categoryCode || null,
+      requestedCategoryId: categoryId || null
     });
   } catch (error) {
     return next(error);
@@ -577,4 +601,3 @@ module.exports = {
   updateOfficerRegistryEntry,
   deleteOfficerRegistryEntry
 };
-

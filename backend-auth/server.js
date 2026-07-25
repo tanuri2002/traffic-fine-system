@@ -4,12 +4,14 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const { initDb, getPool } = require("./db");
 const { seedInitialAdmin } = require("./bootstrap");
 const fineRoutes = require("./fineRoutes");
+const cors = require("cors");
 const { getJwtSecret } = require("./jwtUtil");
 const { verifyToken, requireAdmin } = require("./middleware/auth");
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // CORS

@@ -158,6 +158,21 @@ async function initDb() {
         CONSTRAINT fk_payments_fine_id FOREIGN KEY (fine_id) REFERENCES fines (id) ON DELETE CASCADE ON UPDATE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
+
+    const [driverNameColumn] = await connection.query(
+      `SELECT COUNT(*) AS count
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'fines'
+         AND COLUMN_NAME = 'driver_name'`
+    );
+
+    if (driverNameColumn[0].count === 0) {
+      await connection.query(`
+        ALTER TABLE fines
+        ADD COLUMN driver_name VARCHAR(150) NOT NULL DEFAULT 'UNKNOWN'
+      `);
+    }
   } finally {
     connection.release();
   }

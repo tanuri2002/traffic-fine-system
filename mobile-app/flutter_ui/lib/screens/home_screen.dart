@@ -4,44 +4,11 @@
 /// Author: Member 3
 /// Date: May 2026
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import '../models/fine_model.dart';
-import 'fine_details_screen.dart';
-
-// Sample fine data for testing
-final unpaidFine = Fine(
-  referenceNumber: 'TF20240512345',
-  categoryId: 'CAT001',
-  driverName: 'Nimal Perera',
-  violationType: 'Speed Limit Violation',
-  amount: 5000.00,
-  dueDate: '2026-05-31',
-  status: 'Unpaid',
-  issuedDate: '2026-04-15',
-);
-
-final paidFine = Fine(
-  referenceNumber: 'TF20240423156',
-  categoryId: 'CAT002',
-  driverName: 'Samantha Silva',
-  violationType: 'No Parking Zone',
-  amount: 3500.00,
-  dueDate: '2026-05-20',
-  status: 'Paid',
-  issuedDate: '2026-03-20',
-);
-
-final overdueFine = Fine(
-  referenceNumber: 'TF20240201789',
-  categoryId: 'CAT003',
-  driverName: 'Rajith Kumar',
-  violationType: 'Traffic Light Violation',
-  amount: 7500.00,
-  dueDate: '2026-04-15',
-  status: 'Overdue',
-  issuedDate: '2026-02-15',
-);
+import '../controllers/fine_controller.dart';
+import '../services/officer_auth_service.dart';
 
 /// HomeScreen
 ///
@@ -58,74 +25,61 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _referenceNumberController = TextEditingController();
-  final _categoryIdController = TextEditingController();
-  bool _isLoading = false;
+  final _authService = OfficerAuthService();
+  List<Map<String, dynamic>> _categories = [];
+  Map<String, dynamic>? _selectedCategory;
+  bool _isLoadingCategories = true;
 
   @override
   void dispose() {
     _referenceNumberController.dispose();
-    _categoryIdController.dispose();
     super.dispose();
   }
 
-  Fine _getFineByReference(String reference) {
-    /// Returns a sample `Fine` based on the provided reference number.
-    ///
-    /// This is a local test helper that maps well-known test references
-    /// to `unpaidFine`, `paidFine`, and `overdueFine`. If no match is
-    /// found, it returns a default `Fine` using the current form values.
-
-    if (reference == 'TF20240512345') {
-      return unpaidFine;
-    } else if (reference == 'TF20240423156') {
-      return paidFine;
-    } else if (reference == 'TF20240201789') {
-      return overdueFine;
-    }
-    // Default: return unpaid fine with entered reference
-    return Fine(
-      referenceNumber: _referenceNumberController.text,
-      categoryId: _categoryIdController.text,
-      driverName: 'Test User',
-      violationType: 'Test Violation',
-      amount: 5000.00,
-      dueDate: '2026-05-31',
-      status: 'Unpaid',
-      issuedDate: '2026-04-15',
-    );
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
   }
 
-  void _checkFine() {
+  Future<void> _loadCategories() async {
+    try {
+      final categories = await _authService.getCategories();
+      if (!mounted) return;
+      setState(() {
+        _categories = categories;
+        _isLoadingCategories = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoadingCategories = false);
+    }
+  }
+
+  Future<void> _checkFine() async {
     /// Triggered when the user submits the lookup form.
     /// Validates inputs, shows a loading state, and navigates to
     /// `FineDetailsScreen`. In production this would call the backend.
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      final controller = context.read<FineController>();
+      await controller.searchFine(
+        _referenceNumberController.text,
+        _selectedCategory!['code'].toString(),
+      );
 
-      // TODO: Call API to fetch fine details
-      // For now, simulate a delay
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-
-          // Get fine based on reference number
-          final fine = _getFineByReference(
-            _referenceNumberController.text,
-          );
-
-          // Navigate to FineDetailsScreen
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FineDetailsScreen(fine: fine),
-            ),
-          );
-        }
-      });
+      if (!mounted) return;
+      if (controller.fine != null) {
+        Navigator.pushNamed(context, '/fineDetails', arguments: controller.fine);
+      } else if (controller.error != null) {
+        //final err = controller.error!.toLowerCase();
+        // if (err.contains('unauthorized')) {
+        //   Navigator.pushReplacementNamed(context, '/login');
+        //   return;
+        // }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(controller.error!)),
+        );
+      }
     }
   }
 
@@ -137,15 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (value.length < 10) {
       return 'Reference number must be at least 10 characters';
-    }
-    return null;
-  }
-
-  String? _validateCategoryId(String? value) {
-    /// Validator for the category ID field.
-    /// Ensures the field is not empty.
-    if (value == null || value.isEmpty) {
-      return 'Please enter category ID';
     }
     return null;
   }
@@ -246,22 +191,77 @@ class _HomeScreenState extends State<HomeScreen> {
                           validator: _validateReferenceNumber,
                           keyboardType: TextInputType.text,
                         ),
-                        CustomTextField(
-                          label: 'Category ID',
-                          hintText: 'e.g., CAT001',
-                          controller: _categoryIdController,
-                          validator: _validateCategoryId,
-                          keyboardType: TextInputType.text,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Category',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF001F5C),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _isLoadingCategories
+                                ? const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: Center(child: CircularProgressIndicator()),
+                                  )
+                                : DropdownButtonFormField<Map<String, dynamic>>(
+                                    value: _selectedCategory,
+                                    isExpanded: true,
+                                    decoration: InputDecoration(
+                                      hintText: 'Select violation category',
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 14,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[100],
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                    ),
+                                    items: _categories
+                                        .map((c) => DropdownMenuItem(
+                                              value: c,
+                                              child: Text('${c['title']} (${c['code']})'),
+                                            ))
+                                        .toList(),
+                                    onChanged: (val) => setState(() => _selectedCategory = val),
+                                    validator: (v) => v == null ? 'Please select a category' : null,
+                                  ),
+                          ],
                         ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
 
+                  // Auth shortcut
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: TextButton(
+                  //     onPressed: () {
+                  //       Navigator.pushNamed(context, '/login');
+                  //     },
+                  //     child: const Text('Login'),
+                  //   ),
+                  // ),
+
                   // Check Fine Button
-                  CustomButton(
-                    text: 'Check Fine',
-                    onPressed: _checkFine,
-                    isLoading: _isLoading,
+                  Consumer<FineController>(
+                    builder: (context, controller, _) => CustomButton(
+                      text: 'Check Fine',
+                      onPressed: _checkFine,
+                      isLoading: controller.loading,
+                    ),
                   ),
 
                   const SizedBox(height: 24),

@@ -136,19 +136,19 @@ class FineDetailsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        FineDetailItem(
-                          icon: Icons.person,
-                          label: 'Driver Name',
-                          value: fine.driverName,
-                          iconColor: Colors.blue,
-                          iconBackgroundColor:
-                              Colors.blue.withValues(alpha: 0.1),
-                        ),
-                        const Divider(height: 24),
+                        // FineDetailItem(
+                        //   icon: Icons.person,
+                        //   label: 'Driver Name',
+                        //   value: fine.driverName,
+                        //   iconColor: Colors.blue,
+                        //   iconBackgroundColor:
+                        //       Colors.blue.withValues(alpha: 0.1),
+                        // ),
+                        // const Divider(height: 24),
                         FineDetailItem(
                           icon: Icons.warning_rounded,
                           label: 'Violation Type',
-                          value: fine.violationType,
+                          value: fine.category.title,
                           iconColor: Colors.orange,
                           iconBackgroundColor:
                               Colors.orange.withValues(alpha: 0.1),
@@ -157,20 +157,20 @@ class FineDetailsScreen extends StatelessWidget {
                         FineDetailItem(
                           icon: Icons.attach_money,
                           label: 'Fine Amount',
-                          value: 'Rs. ${fine.amount.toStringAsFixed(2)}',
+                          value: 'Rs. ${fine.amountLkr.toStringAsFixed(2)}',
                           iconColor: Colors.green,
                           iconBackgroundColor:
                               Colors.green.withValues(alpha: 0.1),
                         ),
                         const Divider(height: 24),
-                        FineDetailItem(
-                          icon: Icons.calendar_today,
-                          label: 'Due Date',
-                          value: fine.dueDate,
-                          iconColor: Colors.purple,
-                          iconBackgroundColor:
-                              Colors.purple.withValues(alpha: 0.1),
-                        ),
+                        // FineDetailItem(
+                        //   icon: Icons.calendar_today,
+                        //   label: 'Due Date',
+                        //   value: fine.dueDate,
+                        //   iconColor: Colors.purple,
+                        //   iconBackgroundColor:
+                        //       Colors.purple.withValues(alpha: 0.1),
+                        //),
                         const Divider(height: 24),
                         FineDetailItem(
                           icon: Icons.confirmation_number,
@@ -184,7 +184,7 @@ class FineDetailsScreen extends StatelessWidget {
                         FineDetailItem(
                           icon: Icons.category,
                           label: 'Category ID',
-                          value: fine.categoryId,
+                          value: fine.category.code,
                           iconColor: Colors.indigo,
                           iconBackgroundColor:
                               Colors.indigo.withValues(alpha: 0.1),
