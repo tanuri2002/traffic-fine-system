@@ -62,7 +62,10 @@ const getFineDetails = async (req, res) => {
     );
 
     // Should always exist because we just fetched it
-    return res.status(200).json(rows[0]);
+    return res.status(200).json({
+      ...rows[0],
+      paymentStatus: rows[0]?.status === 'PAID' ? 'APPROVED' : 'PENDING'
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Failed to fetch fine details', error: err.message });
@@ -182,6 +185,7 @@ const processPayment = async (req, res) => {
       referenceNumber,
       categoryId,
       paymentChannel,
+      paymentStatus: 'APPROVED',
       transactionId: `TXN-${payResult.insertId}-${Date.now()}`,
       receiptNumber: `RCPT-${payResult.insertId}`
     });
