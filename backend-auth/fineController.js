@@ -65,6 +65,19 @@ function resolvePaymentChannel(value) {
   return null;
 }
 
+function getPaymentStatus(fine) {
+  return fine?.status === "PAID" ? "APPROVED" : "PENDING";
+}
+
+function ensureAdminAccess(req, res) {
+  if (!req.user || req.user.role !== "admin") {
+    res.status(403).json({ message: "Admin access required" });
+    return false;
+  }
+
+  return true;
+}
+
 function formatFinePaymentResponse(fine) {
   if (!fine) {
     return null;
@@ -78,6 +91,7 @@ function formatFinePaymentResponse(fine) {
     fineAmount: fine.category ? fine.category.amountLkr : null,
     date: fine.createdAt,
     status: fine.status,
+    paymentStatus: getPaymentStatus(fine),
     paidAt: fine.paidAt,
     paymentChannel: fine.paymentChannel,
     category: fine.category,
@@ -201,6 +215,10 @@ async function loginOfficer(req, res, next) {
 
 async function createCategory(req, res, next) {
   try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
     const { code, title, amountLkr, description } = req.body;
 
     const normalizedCode = normalizeCode(code);
@@ -321,6 +339,10 @@ async function listMyFines(req, res, next) {
 
 async function markFineAsPaid(req, res, next) {
   try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
     const referenceNumber = normalizeRef(req.params.referenceNumber);
     const { channel } = req.body;
 
@@ -345,7 +367,14 @@ async function markFineAsPaid(req, res, next) {
 
     const updatedFine = await Fine.updateFineAsPaid(referenceNumber, paymentChannel);
 
-    return res.status(200).json({ message: "Fine marked as paid", fine: updatedFine });
+    return res.status(200).json({
+      message: "Fine marked as paid",
+      fine: {
+        ...updatedFine,
+        status: "PAID",
+        paymentStatus: "APPROVED"
+      }
+    });
   } catch (error) {
     return next(error);
   }
@@ -475,6 +504,10 @@ async function getCategoryCollections(req, res, next) {
 
 async function listOfficerRegistry(req, res, next) {
   try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
     const registry = await Officer.listOfficerRegistry();
     return res.status(200).json(registry);
   } catch (error) {
@@ -484,6 +517,10 @@ async function listOfficerRegistry(req, res, next) {
 
 async function getOfficerRegistryEntry(req, res, next) {
   try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
     const id = req.params.id;
     if (!isPositiveIntegerLike(id)) {
       return res.status(400).json({ message: "Invalid ID format" });
@@ -502,6 +539,10 @@ async function getOfficerRegistryEntry(req, res, next) {
 
 async function createOfficerRegistryEntry(req, res, next) {
   try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
     const { badgeNumber, name, phone, district, active } = req.body;
 
     if (!isNonEmptyString(badgeNumber) || !isNonEmptyString(name) || !isNonEmptyString(phone) || !isNonEmptyString(district)) {
@@ -524,6 +565,10 @@ async function createOfficerRegistryEntry(req, res, next) {
 
 async function updateOfficerRegistryEntry(req, res, next) {
   try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
     const id = req.params.id;
     if (!isPositiveIntegerLike(id)) {
       return res.status(400).json({ message: "Invalid ID format" });
@@ -547,6 +592,10 @@ async function updateOfficerRegistryEntry(req, res, next) {
 
 async function deleteOfficerRegistryEntry(req, res, next) {
   try {
+    if (!ensureAdminAccess(req, res)) {
+      return;
+    }
+
     const id = req.params.id;
     if (!isPositiveIntegerLike(id)) {
       return res.status(400).json({ message: "Invalid ID format" });
