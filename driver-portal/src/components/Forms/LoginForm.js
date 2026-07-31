@@ -5,10 +5,6 @@ import AuthContext from '../../context/AuthContext';
 import { authService } from '../../services/api';
 import { validateBadgeNumber, validatePassword } from '../../utils/validation';
 
-const isMockAuth =
-  process.env.REACT_APP_MOCK_AUTH === 'true' ||
-  process.env.REACT_APP_USE_MOCK === 'true';
-
 function LoginForm() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -72,43 +68,19 @@ function LoginForm() {
       <button type="submit" className="btn-primary" disabled={submitting}>
         {submitting ? 'Signing in...' : 'Sign In'}
       </button>
-      {/* {isMockAuth && (
+
+      <div style={{ marginTop: '0.5rem' }}>
         <button
           type="button"
           className="btn-secondary"
-          onClick={async () => {
-            setSubmitting(true);
-            try {
-              const resp = await authService.login('B12345', 'password123');
-              const { token, officer } = resp.data;
-              login(token, officer);
-              toast.success(`Welcome, ${officer.name}`);
-              navigate('/create-fine');
-            } catch (err) {
-              toast.error('Demo sign in failed');
-            } finally {
-              setSubmitting(false);
-            }
-          }}
+          onClick={() => navigate('/create-officer')}
+          style={{ padding: '0.5rem 0.75rem', fontSize: '0.95rem' }}
         >
-          Sign in as demo
+          New officer? Create account
         </button>
-      )} */}
-      {isMockAuth && (
-        <div style={{ marginTop: '0.5rem' }}>
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => navigate('/create-officer')}
-            style={{ padding: '0.5rem 0.75rem', fontSize: '0.95rem' }}
-          >
-            New officer? Create account
-          </button>
-        </div>
-      )}
+      </div>
     </form>
   );
 }
 
 export default LoginForm;
-

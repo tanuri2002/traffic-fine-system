@@ -112,7 +112,7 @@ function ReferenceForm() {
         >
           <option value="" disabled>Select a category</option>
           {categories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.code}</option>
+            <option key={cat.id} value={cat.id}>{cat.title}</option>
           ))}
         </select>
         {validationErrors.categoryId && (

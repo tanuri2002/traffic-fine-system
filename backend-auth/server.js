@@ -11,19 +11,18 @@ const { verifyToken, requireAdmin } = require("./middleware/auth");
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-// CORS
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+// CORS — allow both frontend apps in dev. Adjust/extend for production.
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",").map((o) => o.trim())
+  : ["http://localhost:3000", "http://localhost:5173"];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
+app.use(express.json());
 
 // Officer register/login (from incoming)
 const { registerOfficer, loginOfficer } = require("./fineController");
@@ -34,7 +33,13 @@ authRouter.post("/officer/login", loginOfficer);
 authRouter.post("/register", registerOfficer);
 authRouter.post("/login", loginOfficer);
 app.use("/auth", authRouter);
-app.use("/api/auth", authRouter);
+
+const apiAuthRouter = express.Router();
+apiAuthRouter.post("/officer/login", loginOfficer);
+// Backward-compatible endpoints used by older clients.
+apiAuthRouter.post("/register", registerOfficer);
+apiAuthRouter.post("/login", loginOfficer);
+app.use("/api/auth", apiAuthRouter);
 
 // Existing route modules (from HEAD)
 const authRoutes = require('./routes/auth');
