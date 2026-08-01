@@ -13,9 +13,30 @@ const NOTIFYLK_SENDER_ID = process.env.NOTIFYLK_SENDER_ID;
 
 const NOTIFYLK_SEND_URL = 'https://app.notify.lk/api/v1/send';
 
+// Notify.lk expects Sri Lankan numbers as 11 digits: country code (94) +
+// 9-digit subscriber number, no leading zero, no '+'.
+// Accepts local format (0771234567), already-prefixed (94771234567),
+// or with a '+' (+94771234567), and normalizes all to 94771234567.
 const formatPhoneForNotify = (toPhone) => {
   if (!toPhone) return '';
-  return String(toPhone).trim().replace(/^\+/, '');
+
+  let digits = String(toPhone).trim().replace(/[^\d]/g, ''); // strip +, spaces, dashes etc.
+
+  if (digits.startsWith('94') && digits.length === 11) {
+    return digits; // already correct: 94XXXXXXXXX
+  }
+
+  if (digits.startsWith('0') && digits.length === 10) {
+    return `94${digits.slice(1)}`; // 0771234567 -> 94771234567
+  }
+
+  if (digits.length === 9) {
+    return `94${digits}`; // 771234567 -> 94771234567
+  }
+
+  // Fallback: return as-is (best effort) so Notify.lk's own validation
+  // error surfaces if the format is still unexpected.
+  return digits;
 };
 
 const sendOfficerPaymentSms = async (firstArg, secondArg) => {
@@ -101,4 +122,3 @@ const sendOfficerPaymentSms = async (firstArg, secondArg) => {
 };
 
 module.exports = { sendOfficerPaymentSms };
-
