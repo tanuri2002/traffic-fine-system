@@ -187,9 +187,33 @@ async function loginOfficer(req, res, next) {
       return res.status(400).json({ message: "badgeNumber and password are required" });
     }
 
-    const officer = await Officer.findOfficerByBadgeNumber(trimString(badgeNumber));
+    let officer = await Officer.findOfficerByBadgeNumber(trimString(badgeNumber));
     if (!officer) {
-      return res.status(401).json({ message: "Officer not found" });
+      const { getPool } = require("./db");
+      const [adminRows] = await getPool().query(
+        "SELECT * FROM administrators WHERE badge_number = ? LIMIT 1",
+        [trimString(badgeNumber)]
+      );
+      if (adminRows.length > 0) {
+        const adminRow = adminRows[0];
+        officer = {
+          id: adminRow.id,
+          badgeNumber: adminRow.badge_number,
+          name: adminRow.full_name,
+          fullName: adminRow.full_name,
+          officialEmail: adminRow.official_email,
+          phone: "",
+          district: "",
+          passwordHash: adminRow.password_hash,
+          role: "admin",
+          createdAt: adminRow.created_at,
+          updatedAt: adminRow.updated_at
+        };
+      }
+    }
+
+    if (!officer) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isValid = await bcrypt.compare(password, officer.passwordHash);
@@ -209,9 +233,13 @@ async function loginOfficer(req, res, next) {
         id: officer.id,
         badgeNumber: officer.badgeNumber,
         name: officer.name,
+        fullName: officer.fullName || officer.name,
+        officialEmail: officer.officialEmail || "",
         phone: officer.phone,
         district: officer.district,
-        role: officer.role
+        role: officer.role,
+        createdAt: officer.createdAt,
+        updatedAt: officer.updatedAt
       }
     });
   } catch (error) {

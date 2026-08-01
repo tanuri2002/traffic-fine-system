@@ -35,7 +35,6 @@ function ConfirmationPage() {
           </div>
         </div>
 
-        <p className="receipt-note">A receipt has been sent to your email address.</p>
 
         <div className="button-group">
           <button 

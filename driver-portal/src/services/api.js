@@ -108,15 +108,17 @@ export const fineService = isMockAuth
       localStorage.setItem('mockFines', JSON.stringify(stored));
       return Promise.resolve({ data: record });
     },
-    getFineDetails: (referenceNumber, categoryId) => {
-      return paymentClient.get('/fine', { params: { referenceNumber, categoryId } });
-    },
+    getFineDetails: (referenceNumber, categoryId) => paymentClient.get('/fine', { params: { referenceNumber, categoryId } }),
     getCategories: () => {
       // Static fallback for mock/dev mode — adjust ids/titles to match your real table if needed
       return Promise.resolve({
         data: [
-          { id: 1, code: 'PARKING', title: 'Test Category - DO NOT USE' },
-          { id: 2, code: 'SPEEDING', title: 'Speed Limit Exceeded' },
+          { id: 1, code: 'SPD-01', title: 'Speeding-Urban Area' },
+          { id: 2, code: 'SPD-02', title: 'Speeding-Highway' },
+          { id: 3, code: 'SIG-01', title: 'Running Red Light' },
+          { id: 4, code: 'PRK-01', title: 'Illegal Parking' },
+          { id: 5, code: 'LIC-01', title: 'Driving Without License' },
+          { id: 6, code: 'SEA-01', title: 'No Seatbelt' }
         ],
       });
     },
@@ -134,4 +136,3 @@ export const paymentService = {
 
 export { authClient, apiClient, paymentClient };
 export default apiClient;
-

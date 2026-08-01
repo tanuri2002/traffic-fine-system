@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { authService } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 function CreateOfficerForm({ onCreated }) {
+    const navigate = useNavigate();
     const [form, setForm] = useState({ badgeNumber: '', name: '', phone: '', district: '', password: '', role: 'officer' });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
@@ -25,9 +27,10 @@ function CreateOfficerForm({ onCreated }) {
         setSubmitting(true);
         try {
             const resp = await authService.createOfficer(form);
-            toast.success('Officer created');
+            toast.success('Officer created. Please log in.');
             setForm({ badgeNumber: '', name: '', phone: '', district: '', password: '', role: 'officer' });
             onCreated?.(resp.data);
+            navigate('/login');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to create officer');
         } finally {
